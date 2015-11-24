@@ -36,6 +36,15 @@
     <ClCompile Include="OOC\Point.c">
       <Filter>OOC</Filter>
     </ClCompile>
+    <ClCompile Include="initOoc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Production.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="String.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OOC\Class.h">
@@ -61,6 +70,18 @@
     </ClInclude>
     <ClInclude Include="OOC\Point_r.h">
       <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="initOoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Production.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="String.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="String_r.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -64,14 +64,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="initOoc.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="OOC\Class.c" />
     <ClCompile Include="OOC\Log.c" />
     <ClCompile Include="OOC\New.c" />
     <ClCompile Include="OOC\Object.c" />
     <ClCompile Include="OOC\Point.c" />
+    <ClCompile Include="Production.c" />
+    <ClCompile Include="String.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="initOoc.h" />
     <ClInclude Include="OOC\Class.h" />
     <ClInclude Include="OOC\Class_r.h" />
     <ClInclude Include="OOC\Log.h" />
@@ -80,6 +84,9 @@
     <ClInclude Include="OOC\Object_r.h" />
     <ClInclude Include="OOC\Point.h" />
     <ClInclude Include="OOC\Point_r.h" />
+    <ClInclude Include="Production.h" />
+    <ClInclude Include="String.h" />
+    <ClInclude Include="String_r.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
