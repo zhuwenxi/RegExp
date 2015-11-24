@@ -36,9 +36,11 @@ void * String_ctor(void * _self, va_list * args)
 
 void * String_dtor(void * _self)
 {
-	struct String * self = super_dtor(Object, _self);
+	struct String * self = _self; 
 	
 	free(self->text);
+
+	self = super_dtor(Object, self);
 
 	return self;
 }
