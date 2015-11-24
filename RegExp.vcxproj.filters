@@ -13,5 +13,54 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="OOC">
+      <UniqueIdentifier>{8dca3c10-c376-433c-a2ff-d5a1422bfd43}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OOC\Class.c">
+      <Filter>OOC</Filter>
+    </ClCompile>
+    <ClCompile Include="OOC\Log.c">
+      <Filter>OOC</Filter>
+    </ClCompile>
+    <ClCompile Include="OOC\New.c">
+      <Filter>OOC</Filter>
+    </ClCompile>
+    <ClCompile Include="OOC\Object.c">
+      <Filter>OOC</Filter>
+    </ClCompile>
+    <ClCompile Include="OOC\Point.c">
+      <Filter>OOC</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="OOC\Class.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Class_r.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Log.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\New.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Object.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Object_r.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Point.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Point_r.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
