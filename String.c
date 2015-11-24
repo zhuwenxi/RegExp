@@ -9,7 +9,7 @@
 #include "OOC\Object_r.h"
 #include "OOC\Class.h"
 
-void * String_ctor(void * _self, va_list * args)
+static void * String_ctor(void * _self, va_list * args)
 {
 	struct String * self = super_ctor(Object, _self, args);
 
@@ -20,7 +20,17 @@ void * String_ctor(void * _self, va_list * args)
 
 	assert(text != NULL);
 
-	length = length == 0 ? strlen(text) : length;
+	if (length == 0)
+	{
+		length = strlen(text);
+	}
+	else
+	{
+		if (length > strlen(text))
+		{
+			length = strlen(text);
+		}
+	}
 
 	self->text = calloc(length + 1, sizeof(char));
 
@@ -34,7 +44,7 @@ void * String_ctor(void * _self, va_list * args)
 	return self;
 }
 
-void * String_dtor(void * _self)
+static void * String_dtor(void * _self)
 {
 	struct String * self = _self; 
 	

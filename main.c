@@ -9,9 +9,10 @@ int main()
 {
 	initOoc();
 
-	const struct String * string = new (String, "hello", NULL);
+	const struct String * string = new (String, "hello", 100, NULL);
+	const struct String * string2 = new (String, "world", 5, NULL);
 
-	printf("%s\n", string->text);
+	printf("%s, %s\n", string->text, string2->text);
 
 	delete(string);
 	 

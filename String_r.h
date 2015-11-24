@@ -9,8 +9,4 @@ struct String
 	char * text;
 };
 
-void * String_ctor(void * _self, va_list * args);
-
-void * String_dtor(void * _self);
-
 #endif
