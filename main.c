@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stddef.h>
 
-#include "initOoc.h"
-#include "String.h"
-#include "String_r.h"
+#include "OOC\OOC.h"
+#include "OOC\String.h"
+#include "OOC\String_r.h"
 
 int main()
 {
-	initOoc();
+	loadOoc();
 
 	const struct String * string = new (String, "hello", 100, NULL);
 	const struct String * string2 = new (String, "world", 5, NULL);

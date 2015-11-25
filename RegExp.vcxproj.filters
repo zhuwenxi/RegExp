@@ -16,9 +16,6 @@
     <Filter Include="OOC">
       <UniqueIdentifier>{8dca3c10-c376-433c-a2ff-d5a1422bfd43}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Utility">
-      <UniqueIdentifier>{f7802371-bb3f-44b8-9242-abcf84b9c5a0}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -39,14 +36,14 @@
     <ClCompile Include="OOC\Point.c">
       <Filter>OOC</Filter>
     </ClCompile>
-    <ClCompile Include="initOoc.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Production.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="String.c">
-      <Filter>Utility</Filter>
+    <ClCompile Include="OOC\String.c">
+      <Filter>OOC</Filter>
+    </ClCompile>
+    <ClCompile Include="OOC\OOC.c">
+      <Filter>OOC</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -74,17 +71,17 @@
     <ClInclude Include="OOC\Point_r.h">
       <Filter>OOC</Filter>
     </ClInclude>
-    <ClInclude Include="initOoc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Production.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="String.h">
-      <Filter>Utility</Filter>
+    <ClInclude Include="OOC\String.h">
+      <Filter>OOC</Filter>
     </ClInclude>
-    <ClInclude Include="String_r.h">
-      <Filter>Utility</Filter>
+    <ClInclude Include="OOC\String_r.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\OOC.h">
+      <Filter>OOC</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
