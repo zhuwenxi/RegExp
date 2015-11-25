@@ -45,6 +45,12 @@
     <ClCompile Include="OOC\OOC.c">
       <Filter>OOC</Filter>
     </ClCompile>
+    <ClCompile Include="Regexp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OOC\Set.c">
+      <Filter>OOC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OOC\Class.h">
@@ -81,6 +87,18 @@
       <Filter>OOC</Filter>
     </ClInclude>
     <ClInclude Include="OOC\OOC.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="Regexp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Production_r.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Set.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Set_r.h">
       <Filter>OOC</Filter>
     </ClInclude>
   </ItemGroup>

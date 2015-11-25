@@ -2,19 +2,19 @@
 #include <stddef.h>
 
 #include "OOC\OOC.h"
-#include "OOC\String.h"
-#include "OOC\String_r.h"
+#include "Regexp.h"
+#include "OOC\Set.h"
+#include "OOC\Set_r.h"
 
 int main()
 {
 	loadOoc();
+	loadRegexp();
+	
 
-	const struct String * string = new (String, "hello", 100, NULL);
-	const struct String * string2 = new (String, "world", 5, NULL);
+	struct Set * set = new (Set);
+	delete(Set);
 
-	printf("%s, %s\n", string->text, string2->text);
-
-	delete(string);
 	 
 
 	/*
