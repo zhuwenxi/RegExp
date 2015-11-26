@@ -92,14 +92,14 @@
     <ClInclude Include="Regexp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Production_r.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="OOC\Set.h">
       <Filter>OOC</Filter>
     </ClInclude>
     <ClInclude Include="OOC\Set_r.h">
       <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="Production_r.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

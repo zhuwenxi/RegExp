@@ -1,8 +1,10 @@
 #ifndef __PRODUCTION_H__
 #define __PRODUCTION_H__
 
-const void * Production;
+extern const void * Production;
 
-const void * ProductionClass;
+extern const void * ProductionToken;
+
+void loadProduction();
 
 #endif
