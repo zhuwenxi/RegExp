@@ -101,5 +101,8 @@
     <ClInclude Include="Production_r.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Regexp_r.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

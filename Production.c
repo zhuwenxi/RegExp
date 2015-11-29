@@ -105,8 +105,6 @@ static struct Set * createBody(char *bodyText)
 	
 	initTrans(trans);
 
-	add(body, new(Set, 0), 0);
-
 	while (*current != '\0')
 	{
 		// Init the state of the automata.
@@ -172,60 +170,65 @@ static struct Set * createBody(char *bodyText)
 				break;
 			}*/
 
+			if (*current == '|')
+			{
+				printf("here.");
+			}
+
 			state = trans[state][*current];
 
 			current++;
 		}
 
-		if (accept == true)
+		/*if (accept == true)
+		{*/
+		if (state == 5)
 		{
-			if (state == 5)
-			{
-				add(body, new(Set, 0), 0);
-			}
-			else if (state == 4)
-			{
-				void * text = new(String, start + 1 , end - start - 2, 0);
-				bool isTerminal = false;
+				// add(body, new(Set, 0), 0);
+		}
+		else if (state == 4)
+		{
+			void * text = new(String, start + 1 , end - start - 2, 0);
+			bool isTerminal = false;
 
-				void * token = new (ProductionToken, text, isTerminal, 0);
+			void * token = new (ProductionToken, text, isTerminal, 0);
 
-				add(body->items[body->length - 1], token);
+			add(body, token);
 
-			} 
-			else if (state == 8)
+		} 
+		else if (state == 8)
+		{
+			void * text = new (String, start + 1, end - start - 2, 0);
+			bool isTerminal = true;
+
+			void * token = new (ProductionToken, text, isTerminal, 0);
+
+			add(body, token);
+
+		}
+		else if (state == 9)
+		{
+			if (end > start)
 			{
-				void * text = new (String, start + 1, end - start - 2, 0);
+				void * text = new (String, start, end - start, 0);
 				bool isTerminal = true;
 
 				void * token = new (ProductionToken, text, isTerminal, 0);
 
-				add(body->items[body->length - 1], token);
+				add(body, token);
 
-			}
-			else if (state == 9)
-			{
-				if (end > start)
-				{
-					void * text = new (String, start, end - start, 0);
-					bool isTerminal = true;
-
-					void * token = new (ProductionToken, text, isTerminal, 0);
-
-					add(body->items[body->length - 1], token);
-
-					current--;
-				}
-				else
-				{
-					assert(0);
-				}
+				current--;
 			}
 			else
 			{
 				assert(0);
 			}
 		}
+		else
+		{
+			assert(0);
+		}
+		// }
 	}
 
 	
@@ -235,7 +238,7 @@ static struct Set * createBody(char *bodyText)
 static bool isLetter(char c)
 {
 	// Letter: {a-z, A-Z, 0-9}
-	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '*';
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '*' || c == '|';
 }
 
 static int initTrans(int trans[][256])
@@ -256,7 +259,7 @@ static int initTrans(int trans[][256])
 	setTrans(trans, 2, 3);
 	setTrans(trans, 3, 3);
 	trans[3]['}'] = 4;
-	trans[0]['|'] = 5;
+	// trans[0]['|'] = 5;
 	trans[0]['['] = 6;
 	trans[6]['|'] = 7;
 	trans[7][']'] = 8;
@@ -305,14 +308,16 @@ void printProduction(void * _production)
 		body = production->body;
 		for (i = 0; i < body->length; i++)
 		{
-			printf("\nexpression %d:\n\n", i);
+			token = cast(ProductionToken, body->items[i]);
+			printProductionToken(token);
+			/*printf("\nexpression %d:\n\n", i);
 			expression = cast(Set, body->items[i]);
 
 			for (j = 0; j < expression->length; j++)
 			{
 				token = cast(ProductionToken, expression->items[j]);
 				printProductionToken(token);
-			}
+			}*/
 		}
 	}
 }
