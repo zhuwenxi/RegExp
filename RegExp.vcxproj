@@ -64,6 +64,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="LrAutomata.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="OOC\Class.c" />
     <ClCompile Include="OOC\Log.c" />
@@ -77,6 +78,8 @@
     <ClCompile Include="Regexp.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LrAutomata.h" />
+    <ClInclude Include="LrAutomata_r.h" />
     <ClInclude Include="OOC\Class.h" />
     <ClInclude Include="OOC\Class_r.h" />
     <ClInclude Include="OOC\Log.h" />

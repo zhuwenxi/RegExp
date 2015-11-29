@@ -51,6 +51,9 @@
     <ClCompile Include="OOC\Set.c">
       <Filter>OOC</Filter>
     </ClCompile>
+    <ClCompile Include="LrAutomata.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OOC\Class.h">
@@ -102,6 +105,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Regexp_r.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LrAutomata.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LrAutomata_r.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
