@@ -15,11 +15,32 @@ int main()
 {
 	loadRegexp();
 
-	struct Production * production = new (Production, 0);
+	struct Set * productionSet = new (Set, 0);
+	struct Production * production= new(Production, "concat->{concat}{repeat}|{repeat}", 0);
+	int i;
 
-	delete(production);
+	add(productionSet, new(Production, "regexp->{regexp}[|]{concat}|{concat}", 0));
+	add(productionSet, production);
+	add(productionSet, new(Production, "repeat->{unit}|{unit}*"));
 
-	printf("%d\n", '[' == '\[');
+	for (i = 0; i < productionSet->length; i++)
+	{
+		printProduction(productionSet->items[i]);
+	}
+	
+	delete(productionSet);
+
+	/*char * origin = "a|b|c";
+	char str[100];
+	strcpy_s(str, sizeof(char) * (strlen(origin) + 1), origin);
+	char * context = NULL;
+	char * p = strtok_s(str, "|", &context);
+
+	while (p != NULL)
+	{
+		printf("%c\n", *p);
+		p = strtok_s(NULL, "|", &context);
+	}*/
 
 	/*
 	 * Pause here for Debug.

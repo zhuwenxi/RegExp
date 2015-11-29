@@ -21,4 +21,7 @@ struct ProductionToken
 	bool isNonterminal;
 };
 
+void printProductionToken(void * token);
+void printProduction(void * production);
+
 #endif

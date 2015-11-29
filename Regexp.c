@@ -2,7 +2,6 @@
 #include "Regexp.h"
 #include "Production.h"
 
-
 void loadRegexp()
 {
 	loadOoc();
