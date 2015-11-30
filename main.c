@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "OOC\OOC.h"
+#include "OOC\New.h"
 #include "Regexp.h"
 #include "OOC\Set.h"
 #include "OOC\Set_r.h"
@@ -12,12 +13,28 @@
 #include "Production_r.h"
 #include "LrAutomata.h"
 #include "LrAutomata_r.h"
+#include "OOC\LinkList.h"
+#include "OOC\LinkList_r.h"
 
 int main()
 {
 	loadRegexp();
 
-	struct Set * grammar = new (Set, 0);
+	struct Class * ll = LinkList;
+
+	void * list = new (LinkList, 0);
+	
+	
+
+	struct LinkListItem * listItem = new (LinkListItem, new (String, "tt", 0), 0);
+
+	listInsert(list, listItem);
+	listDelete(list, listItem);
+
+	// printString(listItem->data);
+	delete(list);
+	
+	/*struct Set * grammar = new (Set, 0);
 	struct LrAutomata * automata;
 	int i;
 
@@ -27,8 +44,8 @@ int main()
 	add(grammar, new(Production, "concat->{repeat}", 0));
 	add(grammar, new(Production, "repeat->{unit}", 0));
 	add(grammar, new(Production, "repeat->{unit}*", 0));
-	add(grammar, new(Production, "unit->({regexp})", 0));
-	add(grammar, new(Production, "unit->[a-zA-Z0-9]", 0));
+	add(grammar, new(Production, "unit->({regexp})", 0));*/
+	// add(grammar, new(Production, "unit->[a-zA-Z0-9]", 0));
 
 	// add(grammar, new(Production, "", 0));
 
@@ -38,9 +55,9 @@ int main()
 		printf("======================================\n");
 	}*/
 
-	automata = new (LrAutomata, grammar, 0);
+	/*automata = new (LrAutomata, grammar, 0);
 
-	delete(automata);
+	delete(automata);*/
 	
 	/*
 	 * Pause here for Debug.
