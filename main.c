@@ -22,7 +22,7 @@ int main()
 
 	struct Class * ll = LinkList;
 
-	void * list = new (LinkList, 0);
+	struct LinkList * list = new (LinkList, 0);
 	
 	
 
@@ -30,7 +30,7 @@ int main()
 
 	listInsert(list, listItem);
 	listDelete(list, listItem);
-
+	
 	// printString(listItem->data);
 	delete(list);
 	
