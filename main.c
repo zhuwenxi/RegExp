@@ -22,16 +22,22 @@ int main()
 
 	struct Class * ll = LinkList;
 
-	void * list = new (LinkList, 0);
+	struct LinkList * list = new (LinkList, 0);
 	
-	
+	struct LinkListItem * listItem1 = new (LinkListItem, new (String, "aaa", 0), 0);
+	struct LinkListItem * listItem2 = new (LinkListItem, new (String, "bbb", 0), 0);
+	struct LinkListItem * listItem3 = new (LinkListItem, new (String, "ccc", 0), 0);
 
-	struct LinkListItem * listItem = new (LinkListItem, new (String, "tt", 0), 0);
+	listInsert(list, listItem1);
+	listInsert(list, listItem2);
+	listInsert(list, listItem3);
 
-	listInsert(list, listItem);
-	listDelete(list, listItem);
+	listDelete(list, listItem2);
+	listDelete(list, listItem3);
+	listDelete(list, listItem1);
 
-	// printString(listItem->data);
+	printf("%p\n", list->head);
+
 	delete(list);
 	
 	/*struct Set * grammar = new (Set, 0);
