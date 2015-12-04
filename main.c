@@ -35,8 +35,7 @@ int main()
 	listDelete(list, listItem2);
 	listDelete(list, listItem3);
 	listDelete(list, listItem1);
-
-	printf("%p\n", list->head);
+	
 
 	delete(list);
 	
