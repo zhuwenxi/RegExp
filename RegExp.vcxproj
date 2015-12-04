@@ -67,7 +67,9 @@
     <ClCompile Include="LrAutomata.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="OOC\Class.c" />
+    <ClCompile Include="OOC\HashTable.c" />
     <ClCompile Include="OOC\LinkList.c" />
+    <ClCompile Include="OOC\List.c" />
     <ClCompile Include="OOC\Log.c" />
     <ClCompile Include="OOC\New.c" />
     <ClCompile Include="OOC\Object.c" />
@@ -83,8 +85,12 @@
     <ClInclude Include="LrAutomata_r.h" />
     <ClInclude Include="OOC\Class.h" />
     <ClInclude Include="OOC\Class_r.h" />
+    <ClInclude Include="OOC\HashTable.h" />
+    <ClInclude Include="OOC\HashTable_r.h" />
     <ClInclude Include="OOC\LinkList.h" />
     <ClInclude Include="OOC\LinkList_r.h" />
+    <ClInclude Include="OOC\List.h" />
+    <ClInclude Include="OOC\List_r.h" />
     <ClInclude Include="OOC\Log.h" />
     <ClInclude Include="OOC\New.h" />
     <ClInclude Include="OOC\Object.h" />
@@ -100,6 +106,9 @@
     <ClInclude Include="Production_r.h" />
     <ClInclude Include="Regexp.h" />
     <ClInclude Include="Regexp_r.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OOC\OOC.vcxproj.filters" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

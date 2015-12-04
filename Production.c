@@ -273,50 +273,6 @@ static void setTrans(int trans[][256], int source, int target)
 	}
 }
 
-void printProductionToken(void * _token)
-{
-	struct ProductionToken * token = _token;
-	
-	if (token != NULL)
-	{
-		printf("text: ");
-		printString(token->text);
-		printf("isTerminal: %d\n", token->isTerminal);
-		printf("isNonterminal: %d\n", token->isNonterminal);
-	}
-}
-
-void printProduction(void * _production)
-{
-	struct Production * production = _production;
-	struct Set * body;
-	struct Set * expression;
-	struct ProductionToken * token;
-	int i, j;
-
-	if (production != NULL)
-	{
-		printf("HEAD:\n");
-		printProductionToken(production->head);
-		printf("\n");
-		printf("BODY:\n");
-		body = production->body;
-		for (i = 0; i < body->length; i++)
-		{
-			token = cast(ProductionToken, body->items[i]);
-			printProductionToken(token);
-			/*printf("\nexpression %d:\n\n", i);
-			expression = cast(Set, body->items[i]);
-
-			for (j = 0; j < expression->length; j++)
-			{
-				token = cast(ProductionToken, expression->items[j]);
-				printProductionToken(token);
-			}*/
-		}
-	}
-}
-
 
 
 

@@ -57,6 +57,12 @@
     <ClCompile Include="OOC\LinkList.c">
       <Filter>OOC</Filter>
     </ClCompile>
+    <ClCompile Include="OOC\HashTable.c">
+      <Filter>OOC</Filter>
+    </ClCompile>
+    <ClCompile Include="OOC\List.c">
+      <Filter>OOC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OOC\Class.h">
@@ -122,5 +128,22 @@
     <ClInclude Include="OOC\LinkList.h">
       <Filter>OOC</Filter>
     </ClInclude>
+    <ClInclude Include="OOC\HashTable.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\HashTable_r.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\List.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\List_r.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OOC\OOC.vcxproj.filters">
+      <Filter>OOC</Filter>
+    </None>
   </ItemGroup>
 </Project>

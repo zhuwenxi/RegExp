@@ -19,25 +19,6 @@
 int main()
 {
 	loadRegexp();
-
-	struct Class * ll = LinkList;
-
-	struct LinkList * list = new (LinkList, 0);
-	
-	struct LinkListItem * listItem1 = new (LinkListItem, new (String, "aaa", 0), 0);
-	struct LinkListItem * listItem2 = new (LinkListItem, new (String, "bbb", 0), 0);
-	struct LinkListItem * listItem3 = new (LinkListItem, new (String, "ccc", 0), 0);
-
-	listInsert(list, listItem1);
-	listInsert(list, listItem2);
-	listInsert(list, listItem3);
-
-	listDelete(list, listItem2);
-	listDelete(list, listItem3);
-	listDelete(list, listItem1);
-	
-
-	delete(list);
 	
 	/*struct Set * grammar = new (Set, 0);
 	struct LrAutomata * automata;
