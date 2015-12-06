@@ -11,8 +11,6 @@
 #include "OOC\String_r.h"
 #include "Production.h"
 #include "Production_r.h"
-#include "LrAutomata.h"
-#include "LrAutomata_r.h"
 #include "OOC\LinkList.h"
 #include "OOC\LinkList_r.h"
 
