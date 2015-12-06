@@ -60,6 +60,9 @@
     <ClCompile Include="OOC\List.c">
       <Filter>OOC</Filter>
     </ClCompile>
+    <ClCompile Include="Automata.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OOC\Class.h">

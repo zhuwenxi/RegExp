@@ -64,6 +64,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Automata.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="OOC\Class.c" />
     <ClCompile Include="OOC\HashTable.c" />

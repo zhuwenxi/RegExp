@@ -13,10 +13,15 @@
 #include "Production_r.h"
 #include "OOC\LinkList.h"
 #include "OOC\LinkList_r.h"
+#include "Automata.h"
 
 int main()
 {
 	loadRegexp();
+
+	void * automata = new (Automata, 0);
+
+	delete(automata);
 	
 	/*struct Set * grammar = new (Set, 0);
 	struct LrAutomata * automata;

@@ -7,6 +7,13 @@
 extern const void * Automata;
 extern const void * State;
 
-struct State * transfor(const struct Automata * automata, const struct State * state);
+extern const void * AutomataClass;
+
+void * transfor(const void * automata, const void * state, const void * token);
+
+
+
+
+void loadAutomata();
 
 #endif
