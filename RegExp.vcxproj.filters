@@ -63,6 +63,9 @@
     <ClCompile Include="Automata.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SlrAutomata.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OOC\Class.h">
@@ -138,6 +141,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Automata.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SlrAutomata_r.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SlrAutomata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

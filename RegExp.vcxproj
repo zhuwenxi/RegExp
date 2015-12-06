@@ -79,6 +79,7 @@
     <ClCompile Include="OOC\String.c" />
     <ClCompile Include="Production.c" />
     <ClCompile Include="Regexp.c" />
+    <ClCompile Include="SlrAutomata.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Automata.h" />
@@ -106,6 +107,8 @@
     <ClInclude Include="Production_r.h" />
     <ClInclude Include="Regexp.h" />
     <ClInclude Include="Regexp_r.h" />
+    <ClInclude Include="SlrAutomata.h" />
+    <ClInclude Include="SlrAutomata_r.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OOC\OOC.vcxproj.filters" />

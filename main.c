@@ -14,14 +14,15 @@
 #include "OOC\LinkList.h"
 #include "OOC\LinkList_r.h"
 #include "Automata.h"
+#include "SlrAutomata.h"
 
 int main()
 {
 	loadRegexp();
 
-	void * automata = new (Automata, 0);
+	void * slrAutomata = new (SlrAutomata, 0);
 
-	delete(automata);
+	delete(slrAutomata);
 	
 	/*struct Set * grammar = new (Set, 0);
 	struct LrAutomata * automata;
