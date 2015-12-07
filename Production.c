@@ -13,6 +13,8 @@
 #include "OOC\Set.h"
 #include "OOC\Set_r.h"
 #include "OOC\String_r.h"
+#include "OOC\String.h"
+#include "OOC\New.h"
 
 
 static struct Set * createBody(char *body);
@@ -46,6 +48,20 @@ static void * ProductionToken_dtor(void * _self)
 	delete(self->text);
 
 	return self;
+}
+
+static struct String * ProductionToken_toString(const void * _self)
+{
+	struct ProductionToken * self = cast(ProductionToken, _self);
+
+	if (self)
+	{
+		return new (String, self->text->text, 0);
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 static void * Production_ctor(void * _self, va_list * args)
@@ -89,6 +105,39 @@ static void * Production_dtor(void * _self)
 	return self;
 }
 
+static struct String * Production_toString(const void * _self)
+{
+	struct Production * self = cast(Production, _self);
+	struct String * retVal;
+	struct String * head;
+	struct String * body;
+	struct String * arrow;
+	struct String * temp;
+
+	if (self)
+	{
+		head = toString(self->head);
+		body = toString(self->body);
+
+		assert(head && body);
+
+		retVal = new (String, "", 0);
+		arrow = new (String, "->", 0);
+
+		temp = retVal;
+		retVal = add(retVal, head, arrow, body, 0);
+		free(temp);
+
+		free(arrow);
+
+		return retVal;
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
 static struct Set * createBody(char *bodyText)
 {
 	struct Set * body = new (Set, 0);
@@ -100,7 +149,7 @@ static struct Set * createBody(char *bodyText)
 
 	char * current = bodyText;
 
-	// Transform graphic of the automata.
+	// Transform diagram of the automata.
 	int trans[100][256];
 	
 	initTrans(trans);
@@ -128,6 +177,10 @@ static struct Set * createBody(char *bodyText)
 				accept = true;
 				end = current;
 				break;
+			}
+			else if (state == 6 || state == 7)
+			{
+				end = current;
 			}
 			else if (state == 9)
 			{
@@ -188,7 +241,7 @@ static struct Set * createBody(char *bodyText)
 
 			void * token = new (ProductionToken, text, isTerminal, 0);
 
-			add(body, token);
+			insert(body, token);
 
 		} 
 		else if (state == 8)
@@ -198,7 +251,7 @@ static struct Set * createBody(char *bodyText)
 
 			void * token = new (ProductionToken, text, isTerminal, 0);
 
-			add(body, token);
+			insert(body, token);
 
 		}
 		else if (state == 9)
@@ -210,7 +263,7 @@ static struct Set * createBody(char *bodyText)
 
 				void * token = new (ProductionToken, text, isTerminal, 0);
 
-				add(body, token);
+				insert(body, token);
 
 				current--;
 			}
@@ -233,7 +286,7 @@ static struct Set * createBody(char *bodyText)
 static bool isLetter(char c)
 {
 	// Letter: {a-z, A-Z, 0-9}
-	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '*' || c == '|' || c == '(' || c == ')';
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '*' || c == '|' || c == '(' || c == ')' || c == '-';
 }
 
 static int initTrans(int trans[][256])
@@ -256,8 +309,10 @@ static int initTrans(int trans[][256])
 	trans[3]['}'] = 4;
 	// trans[0]['|'] = 5;
 	trans[0]['['] = 6;
-	trans[6]['|'] = 7;
+	// trans[6]['|'] = 7;
+	setTrans(trans, 6, 7);
 	trans[7][']'] = 8;
+	setTrans(trans, 7, 7);
 }
 
 static void setTrans(int trans[][256], int source, int target)
@@ -284,11 +339,11 @@ void loadProduction()
 {
 	if (!ProductionToken)
 	{
-		ProductionToken = new (Class, "ProductionToken", Class, sizeof(struct ProductionToken), ctor, ProductionToken_ctor, dtor, ProductionToken_dtor, 0);
+		ProductionToken = new (Class, "ProductionToken", Class, sizeof(struct ProductionToken), ctor, ProductionToken_ctor, dtor, ProductionToken_dtor, toString, ProductionToken_toString, 0);
 	}
 
 	if (!Production)
 	{
-		Production = new (Class, "Production", Object, sizeof(struct Production), ctor, Production_ctor, dtor, Production_dtor);
+		Production = new (Class, "Production", Object, sizeof(struct Production), ctor, Production_ctor, dtor, Production_dtor, toString, Production_toString, 0);
 	}
 }
