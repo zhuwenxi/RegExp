@@ -5,6 +5,8 @@
 
 
 #include "Automata_r.h"
+#include "OOC\Object_r.h"
+#include "OOC\Set_r.h"
 
 struct SlrAutomata
 {
