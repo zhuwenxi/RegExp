@@ -66,6 +66,9 @@
     <ClCompile Include="SlrAutomata.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="OOC\Iterator.c">
+      <Filter>OOC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OOC\Class.h">
@@ -148,6 +151,12 @@
     </ClInclude>
     <ClInclude Include="SlrAutomata.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Iterator.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Iterator_r.h">
+      <Filter>OOC</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
+#include <assert.h>
 
 #include "OOC\OOC.h"
 #include "OOC\New.h"
@@ -15,39 +16,23 @@
 #include "OOC\LinkList_r.h"
 #include "Automata.h"
 #include "SlrAutomata.h"
+#include "OOC\Iterator.h"
 
 int main()
 {
 	loadRegexp();
 
-	void * slrAutomata = new (SlrAutomata, 0);
+	void * str = new (String, "test", 0);
+	void * iter = new (Iterator, str, 0);
 
-	delete(slrAutomata);
-	
-	/*struct Set * grammar = new (Set, 0);
-	struct LrAutomata * automata;
-	int i;
+	printf("%p, %p, %p\n", start(iter), end(iter), next(iter));
 
-	add(grammar, new(Production, "regexp->{regexp}|{concat}", 0));
-	add(grammar, new(Production, "regexp->{concat}", 0));
-	add(grammar, new(Production, "concat->{concat}{repeat}", 0));
-	add(grammar, new(Production, "concat->{repeat}", 0));
-	add(grammar, new(Production, "repeat->{unit}", 0));
-	add(grammar, new(Production, "repeat->{unit}*", 0));
-	add(grammar, new(Production, "unit->({regexp})", 0));*/
-	// add(grammar, new(Production, "unit->[a-zA-Z0-9]", 0));
+	delete(iter);
 
-	// add(grammar, new(Production, "", 0));
+	/*void * slrAutomata = new (SlrAutomata, 0);
 
-	/*for (i = 0; i < productionSet->length; i++)
-	{
-		printProduction(productionSet->items[i]);
-		printf("======================================\n");
-	}*/
+	delete(slrAutomata);*/
 
-	/*automata = new (LrAutomata, grammar, 0);
-
-	delete(automata);*/
 	
 	/*
 	 * Pause here for Debug.
