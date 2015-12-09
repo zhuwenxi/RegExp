@@ -17,17 +17,36 @@
 #include "Automata.h"
 #include "SlrAutomata.h"
 #include "OOC\Iterator.h"
+#include "OOC\Iterator_r.h"
 
 int main()
 {
 	loadRegexp();
 
-	void * str = new (String, "test", 0);
-	void * iter = new (Iterator, str, 0);
+	void * set = new (Set, 0);
+	struct SetIterator * delegate = new (SetIterator, set, 0);
+	struct Iterator * iter;
+	struct String * text;
 
-	printf("%p, %p, %p\n", start(iter), end(iter), next(iter));
+	insert(set, new (String, "FILE"));
+	insert(set, new (String, "EDIT"));
+	insert(set, new (String, "VIEW"));
 
-	delete(iter);
+	struct Iterator * s = start(delegate);
+	struct iterator * e = end(delegate);
+
+	printf("%d\n", s==e);
+
+	for (iter = start(delegate); iter != end(delegate); iter = next(iter))
+	{
+		text = toString(iter->data);
+
+		printf("%s\n", text->text);
+
+		delete(text);
+		
+	}
+	
 
 	/*void * slrAutomata = new (SlrAutomata, 0);
 
