@@ -32,14 +32,13 @@ int main()
 	insert(set, new (String, "EDIT"));
 	insert(set, new (String, "VIEW"));
 
-	struct Iterator * s = start(delegate);
-	struct iterator * e = end(delegate);
+	struct String * s = start(delegate);
+	struct String * e = end(delegate);
 
-	printf("%d\n", s==e);
 
-	for (iter = start(delegate); iter != end(delegate); iter = next(iter))
+	for (iter = start(delegate); iter != end(delegate); iter = next(delegate))
 	{
-		text = toString(iter->data);
+		text = toString(iter);
 
 		printf("%s\n", text->text);
 
