@@ -50,6 +50,26 @@ static void * ProductionToken_dtor(void * _self)
 	return self;
 }
 
+static bool ProductionToken_equals(const void * _self, const void * _another)
+{
+	struct ProductionToken * self = cast(ProductionToken, _self);
+	struct ProductionToken * another = cast(ProductionToken, _another);
+
+	return self && another && equals(self->text, another->text) && self->isTerminal == another->isTerminal;
+}
+
+static void * ProductionToken_clone(const void * self)
+{
+	struct ProductionToken * token = cast(ProductionToken, self);
+	struct String * text;
+
+	assert(token);
+
+	text = new(String, token->text->text, 0);
+
+	return new (ProductionToken, text, token->isTerminal, 0);
+}
+
 static struct String * ProductionToken_toString(const void * _self)
 {
 	struct ProductionToken * self = cast(ProductionToken, _self);
@@ -339,7 +359,7 @@ void loadProduction()
 {
 	if (!ProductionToken)
 	{
-		ProductionToken = new (Class, "ProductionToken", Class, sizeof(struct ProductionToken), ctor, ProductionToken_ctor, dtor, ProductionToken_dtor, toString, ProductionToken_toString, 0);
+		ProductionToken = new (Class, "ProductionToken", Class, sizeof(struct ProductionToken), ctor, ProductionToken_ctor, dtor, ProductionToken_dtor, toString, ProductionToken_toString, equals, ProductionToken_equals, clone, ProductionToken_clone, 0);
 	}
 
 	if (!Production)

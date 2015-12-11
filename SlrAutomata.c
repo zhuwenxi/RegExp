@@ -16,6 +16,7 @@
 
 
 
+
 /*
  * Declarations:
  */
@@ -24,15 +25,30 @@ const void * SlrAutomata;
 const void * State;
 
 static struct Set * initGrammar();
+static struct Set * initGrammarSymbol(struct Set * grammar);
+static struct Set * extractGrammarSymbol(const struct Production * prod);
 
 
 
 static void * SlrAutomata_ctor(void * _self, va_list * args)
 {
 	struct Set * grammar = initGrammar();
-	struct Set * grammarSymbol;
+	struct Set * grammarSymbol = initGrammarSymbol(grammar);
 	struct String * str;
-	int i;
+	struct SetIterator * iter = new (SetIterator, grammarSymbol, 0);
+	struct ProductionToken * data;
+
+	for (data = start(iter); data != end(iter); data = next(iter))
+	{
+		str = toString(data);
+
+		printf("%s\n", str->text);
+
+		delete(str);
+	}
+
+
+	/*int i;
 	
 	for (i = 0; i < grammar->length; i++)
 	{
@@ -41,7 +57,7 @@ static void * SlrAutomata_ctor(void * _self, va_list * args)
 		printf("%s\n", str->text);
 
 		delete(str);
-	}
+	}*/
 	
 
 	return _self;
@@ -77,7 +93,23 @@ static struct Set * initGrammar()
 
 static struct Set * initGrammarSymbol(struct Set * grammar)
 {
+	struct SetIterator * iterator = new (SetIterator, grammar, 0);
+	struct Set * grammarSymbol = new (Set, 0);
+	struct Set * symbolsInProduction;
+	struct Production * prod;
+	
+	for (prod = start(iterator); prod != end(iterator); prod = next(iterator))
+	{
+		symbolsInProduction = extractGrammarSymbol(prod);
 
+		merge(grammarSymbol, symbolsInProduction, 0);
+
+		delete(symbolsInProduction);
+	}
+
+	delete(iterator);
+
+	return grammarSymbol;
 }
 
 static struct Set * closure(struct Set * grammar)
@@ -105,6 +137,38 @@ static void * initStates()
 
 	} while (statesLength != states->length);
 }
+
+static struct Set * extractGrammarSymbol(const struct Production * prod)
+{
+	struct Set * body = prod->body;
+	struct SetIterator * iterator = new (SetIterator, body, 0);
+	struct Set * grammarSymbol;
+	struct ProductionToken * token;
+
+	if (body)
+	{
+		grammarSymbol = new (Set, 0);
+
+		for (token = start(iterator); token != end(iterator); token = next(iterator))
+		{
+			insert(grammarSymbol, clone(token));
+		}
+
+		delete(iterator);
+
+		return grammarSymbol;
+	}
+	else
+	{
+		delete(iterator);
+
+		return NULL;
+	}
+}
+
+
+
+
 
 void loadSlrAutomata()
 {

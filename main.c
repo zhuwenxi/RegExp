@@ -23,7 +23,7 @@ int main()
 {
 	loadRegexp();
 
-	void * set = new (Set, 0);
+	/*void * set = new (Set, 0);
 	struct SetIterator * delegate = new (SetIterator, set, 0);
 	struct Iterator * iter;
 	struct String * text;
@@ -44,12 +44,12 @@ int main()
 
 		delete(text);
 		
-	}
+	}*/
 	
 
-	/*void * slrAutomata = new (SlrAutomata, 0);
+	void * slrAutomata = new (SlrAutomata, 0);
 
-	delete(slrAutomata);*/
+	delete(slrAutomata);
 
 	
 	/*
