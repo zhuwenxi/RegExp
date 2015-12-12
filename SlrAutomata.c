@@ -24,9 +24,11 @@ const void * SlrAutomata;
 
 const void * State;
 
+static void * initStates(struct SlrAutomata * automata);
 static struct Set * initGrammar();
 static struct Set * initGrammarSymbol(struct Set * grammar);
 static struct Set * extractGrammarSymbol(const struct Production * prod);
+
 
 
 
@@ -117,25 +119,50 @@ static struct Set * closure(struct Set * grammar)
 	return NULL;
 }
 
-static void * initStates()
+static void * initStates(struct SlrAutomata * automata)
 {
-	struct Set * setOfItems = new (Set, 0);
-	struct Production * initialItem = new (Production, "regexp'->{regexp}", 0);
 	struct Set * states;
+	struct Set * state0 = new (Set, 0);
 	struct Set * grammarSymbol;
+
+	struct Production * initialItem = new (Production, "regexp'->{regexp}", 0);
+	
+	int stateIndex;
+	int productionIndex;
+	int symbolIndex;
+	
+
 	int statesLength = 0;
 
-	insert(setOfItems, initialItem);
+	insert(state0, initialItem);
+	insert(states, state0);
 
-	states = closure(setOfItems);
+	state0 = closure(state0);
 
 	do
 	{
 		statesLength = states->length;
 
+		for (stateIndex = 0; stateIndex < states->length; stateIndex ++)
+		{
+			struct Set * state = states->items[stateIndex];
+
+			for (symbolIndex = 0; symbolIndex < grammarSymbol->length; symbolIndex ++)
+			{
+				struct ProductionToken * symbol = grammarSymbol->items[symbolIndex];
+				struct Set * newState = transfor(automata, state, symbol);
+
+				if (!search(states, newState))
+				{
+					insert(states, newState);
+				}
+			}
+		}
 		
 
 	} while (statesLength != states->length);
+
+	return states;
 }
 
 static struct Set * extractGrammarSymbol(const struct Production * prod)
