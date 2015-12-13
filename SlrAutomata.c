@@ -13,6 +13,7 @@
 #include "OOC\New.h"
 #include "OOC\Class.h"
 #include "OOC\Object.h"
+#include "OOC\String.h"
 
 
 
@@ -28,26 +29,31 @@ static void * initStates(struct SlrAutomata * automata);
 static struct Set * initGrammar();
 static struct Set * initGrammarSymbol(struct Set * grammar);
 static struct Set * extractGrammarSymbol(const struct Production * prod);
+static void addDotPrefix(struct Set * grammar);
+static struct ProductionToken * tokenNextToDot(struct Production * production);
 
 
 
 
 static void * SlrAutomata_ctor(void * _self, va_list * args)
 {
-	struct Set * grammar = initGrammar();
+	struct Set * states = initStates(_self);
+
+
+	/*struct Set * grammar = initGrammar();
 	struct Set * grammarSymbol = initGrammarSymbol(grammar);
 	struct String * str;
 	struct SetIterator * iter = new (SetIterator, grammarSymbol, 0);
-	struct ProductionToken * data;
+	struct ProductionToken * data;*/
 
-	for (data = start(iter); data != end(iter); data = next(iter))
+	/*for (data = start(iter); data != end(iter); data = next(iter))
 	{
 		str = toString(data);
 
 		printf("%s\n", str->text);
 
 		delete(str);
-	}
+	}*/
 
 
 	/*int i;
@@ -114,16 +120,67 @@ static struct Set * initGrammarSymbol(struct Set * grammar)
 	return grammarSymbol;
 }
 
-static struct Set * closure(struct Set * grammar)
+static struct Set * closure(struct Set * state, struct Set * grammar)
 {
-	return NULL;
+	int prevLength;
+
+	
+
+	struct Production * item;
+	struct Production * prod;
+
+	do
+	{
+		prevLength = state->length;
+
+		struct SetIterator * stateIter = new (SetIterator, state, 0);
+
+		for (item = start(stateIter); item != end(stateIter); item = next(stateIter))
+		{
+			struct ProductionToken * tokenNext = tokenNextToDot(item);
+
+			/*struct String * str = toString(state);
+
+			printf("%s\n================================================\n", str->text);*/
+
+			if (tokenNext)
+			{
+				struct SetIterator * grammarIter = new (SetIterator, grammar, 0);
+
+				for (prod = start(grammarIter); prod != end(grammarIter); prod = next(grammarIter))
+				{
+					if (equals(prod->head, tokenNext))
+					{
+						struct Production * newItem = clone(prod);
+
+						addDotPrefix(newItem);
+
+						if (!search(state, newItem))
+						{
+							insert(state, newItem);
+						}
+						
+					}
+				}
+
+				delete(grammarIter);
+			}
+		}
+
+		delete(stateIter);
+	} 
+	while (state->length != prevLength);
+
+	return state;
 }
 
 static void * initStates(struct SlrAutomata * automata)
 {
-	struct Set * states;
+	struct Set * states = new (Set, 0);
 	struct Set * state0 = new (Set, 0);
-	struct Set * grammarSymbol;
+	struct Set * grammar = initGrammar();
+
+	struct Set * grammarSymbol = initGrammarSymbol(grammar);
 
 	struct Production * initialItem = new (Production, "regexp'->{regexp}", 0);
 	
@@ -131,13 +188,25 @@ static void * initStates(struct SlrAutomata * automata)
 	int productionIndex;
 	int symbolIndex;
 	
-
 	int statesLength = 0;
+
 
 	insert(state0, initialItem);
 	insert(states, state0);
 
-	state0 = closure(state0);
+
+	addDotPrefix(initialItem);
+
+	/*struct String * grammarTxt = toString(state0);
+
+	printf("%s\n", grammarTxt->text);*/
+
+
+	state0 = closure(state0, grammar);
+
+	struct String * stateTxt = toString(state0);
+
+	printf("%s\n", stateTxt->text);
 
 	do
 	{
@@ -152,7 +221,7 @@ static void * initStates(struct SlrAutomata * automata)
 				struct ProductionToken * symbol = grammarSymbol->items[symbolIndex];
 				struct Set * newState = transfor(automata, state, symbol);
 
-				if (!search(states, newState))
+				if (newState && !search(states, newState))
 				{
 					insert(states, newState);
 				}
@@ -191,6 +260,43 @@ static struct Set * extractGrammarSymbol(const struct Production * prod)
 
 		return NULL;
 	}
+}
+
+static void addDotPrefix(struct Production * production)
+{
+	struct Set * body = production->body;
+	struct ProductionToken * token = new (ProductionToken, new (String, "DOT", 0), false, 0);
+
+	token->isFlag = true;
+
+	insertAt(body, token, 0);
+}
+
+static struct ProductionToken * tokenNextToDot(struct Production * production)
+{
+	assert(production);
+
+	struct ProductionToken * dot = new (ProductionToken, new (String, "DOT", 0), false, 0);
+	struct Set * body = production->body;
+	int i;
+
+	dot->isFlag = true;
+
+	for (i = 0; i < body->length - 1; i ++)
+	{
+		struct ProductionToken * token = body->items[i];
+
+		if (equals(dot, token))
+		{
+			delete(dot);
+
+			return body->items[i + 1];
+		}
+	}
+
+	delete(dot);
+
+	return NULL;
 }
 
 

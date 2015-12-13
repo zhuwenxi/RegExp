@@ -55,7 +55,7 @@ static bool ProductionToken_equals(const void * _self, const void * _another)
 	struct ProductionToken * self = cast(ProductionToken, _self);
 	struct ProductionToken * another = cast(ProductionToken, _another);
 
-	return self && another && equals(self->text, another->text) && self->isTerminal == another->isTerminal;
+	return self && another && equals(self->text, another->text) && self->isTerminal == another->isTerminal && self->isFlag == another->isFlag;
 }
 
 static void * ProductionToken_clone(const void * self)
@@ -88,6 +88,12 @@ static void * Production_ctor(void * _self, va_list * args)
 {
 	struct Production * self = cast(Production, _self);
 	char * productionText = va_arg(*args, char *);
+
+	if (!productionText)
+	{
+		return self;
+	}
+
 	struct ProductionToken * head;
 	struct Set * body = new (Set, 0);
 	char * separator = "->";
@@ -123,6 +129,28 @@ static void * Production_dtor(void * _self)
 	delete(self->body);
 
 	return self;
+}
+
+static void * Production_clone(const struct Production * self)
+{
+	assert(self);
+
+	struct Production * prodCopy = new (Production, 0);
+
+	prodCopy->body = clone(self->body);
+	prodCopy->head = clone(self->head);
+
+	return prodCopy;
+}
+
+static bool Production_equals(const void * _self, const void * _another)
+{
+	struct Production * self = cast(Production, _self);
+	struct Production * another = cast(Production, _another);
+
+	assert(self && another);
+
+	return equals(self->head, another->head) && equals(self->body, another->body);
 }
 
 static struct String * Production_toString(const void * _self)
@@ -364,6 +392,6 @@ void loadProduction()
 
 	if (!Production)
 	{
-		Production = new (Class, "Production", Object, sizeof(struct Production), ctor, Production_ctor, dtor, Production_dtor, toString, Production_toString, 0);
+		Production = new (Class, "Production", Object, sizeof(struct Production), ctor, Production_ctor, dtor, Production_dtor, toString, Production_toString, clone, Production_clone, equals, Production_equals, 0);
 	}
 }
