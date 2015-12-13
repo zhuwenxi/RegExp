@@ -78,7 +78,29 @@ static void * SlrAutomata_dtor(void * _self)
 
 static void * SlrAutomata_transfor(const void * _automata, const void * _state, const void * _token)
 {
-	return NULL;
+	struct Set * state = cast(Set, _state);
+	struct Set * token = cast(ProductionToken, _token);
+
+	assert(state && token);
+
+	struct Set * targetState = new (Set, 0);
+
+	struct SetIterator * iter = new (SetIterator, state, 0);
+	struct Production * prod;
+
+	for (prod = start(iter); prod != end(iter); prod = next(iter))
+	{
+		struct ProductionToken * nextToken = tokenNextToDot(prod);
+
+		if (nextToken && equals(nextToken, token))
+		{
+			struct Production * nextProduction = clone(prod);
+
+			insert(targetState, nextProduction);
+		}
+	}
+
+	return targetState;
 }
 
 static struct Set * initGrammar()
@@ -138,10 +160,6 @@ static struct Set * closure(struct Set * state, struct Set * grammar)
 		for (item = start(stateIter); item != end(stateIter); item = next(stateIter))
 		{
 			struct ProductionToken * tokenNext = tokenNextToDot(item);
-
-			/*struct String * str = toString(state);
-
-			printf("%s\n================================================\n", str->text);*/
 
 			if (tokenNext)
 			{
