@@ -79,7 +79,7 @@ static void * SlrAutomata_dtor(void * _self)
 static void * SlrAutomata_transfor(const void * _automata, const void * _state, const void * _token)
 {
 	struct Set * state = cast(Set, _state);
-	struct Set * token = cast(ProductionToken, _token);
+	struct ProductionToken * token = cast(ProductionToken, _token);
 
 	assert(state && token);
 
@@ -102,6 +102,8 @@ static void * SlrAutomata_transfor(const void * _automata, const void * _state, 
 			insert(targetState, nextProduction);
 		}
 	}
+
+	delete(prod);
 
 	if (targetState->length)
 	{
@@ -243,15 +245,18 @@ static void * initStates(struct SlrAutomata * automata)
 
 				struct Set * newState = transfor(automata, state, symbol);
 
-				if (newState)
+				/*if (newState)
 				{
 					struct String * stateStr = toString(newState);
 					printf("%s\n======================\n", stateStr->text);
-				}
+				}*/
 				
 				if (newState && !search(states, newState))
 				{
 					insert(states, newState);
+
+					struct String * stateStr = toString(newState);
+					printf("%s\n======================\n", stateStr->text);
 				}
 				else
 				{
@@ -264,7 +269,7 @@ static void * initStates(struct SlrAutomata * automata)
 	} while (statesLength != states->length);
 
 	
-	int i;
+	/*int i;
 
 	for (i = 0; i < states->length; i++)
 	{
@@ -272,7 +277,7 @@ static void * initStates(struct SlrAutomata * automata)
 		struct String * str = toString(state);
 		printf("%s\n==========================\n", str->text);
 		delete(str);
-	}
+	}*/
 
 	return states;
 }

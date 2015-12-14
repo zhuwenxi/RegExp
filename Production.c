@@ -67,7 +67,10 @@ static void * ProductionToken_clone(const void * self)
 
 	text = new(String, token->text->text, 0);
 
-	return new (ProductionToken, text, token->isTerminal, 0);
+	struct ProductionToken * copy = new (ProductionToken, text, token->isTerminal, 0);
+	copy->isFlag = token->isFlag;
+
+	return copy;
 }
 
 static struct String * ProductionToken_toString(const void * _self)
