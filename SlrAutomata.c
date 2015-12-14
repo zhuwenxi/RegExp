@@ -96,11 +96,22 @@ static void * SlrAutomata_transfor(const void * _automata, const void * _state, 
 		{
 			struct Production * nextProduction = clone(prod);
 
+			int indexOfNextToken = indexOf(prod->body, nextToken);
+			swap(nextProduction->body, indexOfNextToken, indexOfNextToken - 1);
+
 			insert(targetState, nextProduction);
 		}
 	}
 
-	return targetState;
+	if (targetState->length)
+	{
+		return targetState;
+	}
+	else
+	{
+		return NULL;
+	}
+	
 }
 
 static struct Set * initGrammar()
@@ -215,16 +226,8 @@ static void * initStates(struct SlrAutomata * automata)
 
 	addDotPrefix(initialItem);
 
-	/*struct String * grammarTxt = toString(state0);
-
-	printf("%s\n", grammarTxt->text);*/
-
 
 	state0 = closure(state0, grammar);
-
-	struct String * stateTxt = toString(state0);
-
-	printf("%s\n", stateTxt->text);
 
 	do
 	{
@@ -237,17 +240,39 @@ static void * initStates(struct SlrAutomata * automata)
 			for (symbolIndex = 0; symbolIndex < grammarSymbol->length; symbolIndex ++)
 			{
 				struct ProductionToken * symbol = grammarSymbol->items[symbolIndex];
+
 				struct Set * newState = transfor(automata, state, symbol);
 
+				if (newState)
+				{
+					struct String * stateStr = toString(newState);
+					printf("%s\n======================\n", stateStr->text);
+				}
+				
 				if (newState && !search(states, newState))
 				{
 					insert(states, newState);
+				}
+				else
+				{
+					delete(newState);
 				}
 			}
 		}
 		
 
 	} while (statesLength != states->length);
+
+	
+	int i;
+
+	for (i = 0; i < states->length; i++)
+	{
+		void * state = states->items[i];
+		struct String * str = toString(state);
+		printf("%s\n==========================\n", str->text);
+		delete(str);
+	}
 
 	return states;
 }
