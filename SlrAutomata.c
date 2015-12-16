@@ -244,19 +244,19 @@ static void * initStates(struct SlrAutomata * automata)
 				struct ProductionToken * symbol = grammarSymbol->items[symbolIndex];
 
 				struct Set * newState = transfor(automata, state, symbol);
-
-				/*if (newState)
-				{
-					struct String * stateStr = toString(newState);
-					printf("%s\n======================\n", stateStr->text);
-				}*/
 				
-				if (newState && !search(states, newState))
+				if (newState)
 				{
-					insert(states, newState);
+					newState = closure(newState, grammar);
 
-					struct String * stateStr = toString(newState);
-					printf("%s\n======================\n", stateStr->text);
+					if (!search(states, newState))
+					{
+						/*struct String * stateStr = toString(newState);
+						printf("%s\n======================\n", stateStr->text);*/
+
+						insert(states, newState);
+					}
+					
 				}
 				else
 				{
@@ -269,15 +269,15 @@ static void * initStates(struct SlrAutomata * automata)
 	} while (statesLength != states->length);
 
 	
-	/*int i;
+	int i;
 
 	for (i = 0; i < states->length; i++)
 	{
 		void * state = states->items[i];
 		struct String * str = toString(state);
-		printf("%s\n==========================\n", str->text);
+		printf("state %d:\n\n%s\n==========================\n", i, str->text);
 		delete(str);
-	}*/
+	}
 
 	return states;
 }
