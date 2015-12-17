@@ -14,6 +14,8 @@
 #include "OOC\Class.h"
 #include "OOC\Object.h"
 #include "OOC\String.h"
+#include "OOC\HashTable.h"
+#include "OOC\HashTable_r.h"
 
 
 
@@ -23,11 +25,14 @@
  */
 const void * SlrAutomata;
 
-const void * State;
+
+
 
 static void * initStates(struct SlrAutomata * automata);
 static struct Set * initGrammar();
 static struct Set * initGrammarSymbol(struct Set * grammar);
+static void updateGoto(struct SlrAutomata * slrAutomata);
+static void constructAction(struct SlrAutomata * slrAutomata);
 static struct Set * extractGrammarSymbol(const struct Production * prod);
 static void addDotPrefix(struct Set * grammar);
 static struct ProductionToken * tokenNextToDot(struct Production * production);
@@ -37,36 +42,14 @@ static struct ProductionToken * tokenNextToDot(struct Production * production);
 
 static void * SlrAutomata_ctor(void * _self, va_list * args)
 {
+	struct SlrAutomata * self = cast(SlrAutomata, _self);
+
+	assert(self);
+
+	self->GOTO = new(HashTable, 0);
+	self->ACTION = new(HashTable, 0);
+
 	struct Set * states = initStates(_self);
-
-
-	/*struct Set * grammar = initGrammar();
-	struct Set * grammarSymbol = initGrammarSymbol(grammar);
-	struct String * str;
-	struct SetIterator * iter = new (SetIterator, grammarSymbol, 0);
-	struct ProductionToken * data;*/
-
-	/*for (data = start(iter); data != end(iter); data = next(iter))
-	{
-		str = toString(data);
-
-		printf("%s\n", str->text);
-
-		delete(str);
-	}*/
-
-
-	/*int i;
-	
-	for (i = 0; i < grammar->length; i++)
-	{
-		str = toString(grammar->items[i]);
-		
-		printf("%s\n", str->text);
-
-		delete(str);
-	}*/
-	
 
 	return _self;
 }
@@ -119,7 +102,6 @@ static void * SlrAutomata_transfor(const void * _automata, const void * _state, 
 static struct Set * initGrammar()
 {
 	struct Set * grammar = new (Set, 0);
-	struct LrAutomata * automata;
 
 	insert(grammar, new(Production, "regexp'->{regexp}", 0));
 	insert(grammar, new(Production, "regexp->{regexp}|{concat}", 0));
@@ -251,10 +233,11 @@ static void * initStates(struct SlrAutomata * automata)
 
 					if (!search(states, newState))
 					{
-						/*struct String * stateStr = toString(newState);
-						printf("%s\n======================\n", stateStr->text);*/
-
+						// Add new state into states.
 						insert(states, newState);
+
+						// Update the "goto" hash table.
+						updateGoto(automata, newState, symbol);
 					}
 					
 				}
@@ -280,6 +263,23 @@ static void * initStates(struct SlrAutomata * automata)
 	}
 
 	return states;
+}
+
+static void updateGoto(struct SlrAutomata * slrAutomata, struct Set * state, struct ProductionToken * symbol)
+{
+	struct HashTable * hashByState = slrAutomata->GOTO;
+
+	assert(hashByState);
+
+	if (!search(hashByState, state))
+	{
+		
+	}
+}
+
+static void constructAction(struct SlrAutomata * slrAutomata)
+{
+
 }
 
 static struct Set * extractGrammarSymbol(const struct Production * prod)
@@ -356,10 +356,5 @@ void loadSlrAutomata()
 	if (!SlrAutomata)
 	{
 		SlrAutomata = new (AutomataClass, "SlrAutomata", Automata, sizeof(struct SlrAutomata), ctor, SlrAutomata_ctor, dtor, SlrAutomata_dtor, transfor, SlrAutomata_transfor,0);
-	}
-
-	if (!State)
-	{
-		State = new (Class, "State", Object, sizeof(struct State), 0);
 	}
 }

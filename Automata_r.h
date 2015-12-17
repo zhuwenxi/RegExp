@@ -12,15 +12,7 @@ struct Automata
 	struct Object _;
 	struct Set * grammar;
 	struct Set * states;
-	struct HashTable * transitionGraphic;
 };
-
-struct State
-{
-	struct Object;
-	struct Set * items;
-};
-
 
 struct AutomataClass
 {

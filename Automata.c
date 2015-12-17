@@ -11,7 +11,6 @@
 
 
 const void * Automata;
-const void * State;
 
 const void * AutomataClass;
 
