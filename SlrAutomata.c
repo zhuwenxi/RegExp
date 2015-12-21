@@ -31,7 +31,7 @@ const void * SlrAutomata;
 static void * initStates(struct SlrAutomata * automata);
 static struct Set * initGrammar();
 static struct Set * initGrammarSymbol(struct Set * grammar);
-static void updateGoto(struct SlrAutomata * slrAutomata);
+static void updateGoto(struct SlrAutomata * slrAutomata, struct Set * state, struct ProductionToken * symbol, struct Set * targetState);
 static void constructAction(struct SlrAutomata * slrAutomata);
 static struct Set * extractGrammarSymbol(const struct Production * prod);
 static void addDotPrefix(struct Set * grammar);
@@ -237,7 +237,7 @@ static void * initStates(struct SlrAutomata * automata)
 						insert(states, newState);
 
 						// Update the "goto" hash table.
-						updateGoto(automata, newState, symbol);
+						updateGoto(automata, state, symbol, newState);
 					}
 					
 				}
@@ -265,15 +265,22 @@ static void * initStates(struct SlrAutomata * automata)
 	return states;
 }
 
-static void updateGoto(struct SlrAutomata * slrAutomata, struct Set * state, struct ProductionToken * symbol)
+static void updateGoto(struct SlrAutomata * slrAutomata, struct Set * _state, struct ProductionToken * _symbol, struct Set * _targetState)
 {
 	struct HashTable * hashByState = slrAutomata->GOTO;
-
+	
 	assert(hashByState);
 
-	if (!search(hashByState, state))
+	struct Set * state = clone(_state);
+	struct Set * symbol = clone(_symbol);
+	struct Set * targetState = clone(_targetState);
+
+	struct Pair * statePair = search(hashByState, state);
+	struct HashTable * hashBySymbol;
+
+	if (!statePair)
 	{
-		
+		statePair = new (Pair, state, NULL);
 	}
 }
 
