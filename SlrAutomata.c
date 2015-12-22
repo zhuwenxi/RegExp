@@ -51,6 +51,9 @@ static void * SlrAutomata_ctor(void * _self, va_list * args)
 
 	struct Set * states = initStates(_self);
 
+	/*struct String * gotoString = toString(self->GOTO);
+	printf("%s\n", gotoString->text);*/
+
 	return _self;
 }
 
@@ -252,7 +255,7 @@ static void * initStates(struct SlrAutomata * automata)
 	} while (statesLength != states->length);
 
 	
-	int i;
+	/*int i;
 
 	for (i = 0; i < states->length; i++)
 	{
@@ -260,7 +263,7 @@ static void * initStates(struct SlrAutomata * automata)
 		struct String * str = toString(state);
 		printf("state %d:\n\n%s\n==========================\n", i, str->text);
 		delete(str);
-	}
+	}*/
 
 	return states;
 }
@@ -268,7 +271,7 @@ static void * initStates(struct SlrAutomata * automata)
 static void updateGoto(struct SlrAutomata * slrAutomata, struct Set * _state, struct ProductionToken * _symbol, struct Set * _targetState)
 {
 	struct HashTable * hashByState = slrAutomata->GOTO;
-	
+
 	assert(hashByState);
 
 	struct Set * state = clone(_state);
@@ -280,7 +283,25 @@ static void updateGoto(struct SlrAutomata * slrAutomata, struct Set * _state, st
 
 	if (!statePair)
 	{
-		statePair = new (Pair, state, NULL);
+		statePair = new (Pair, state, new (HashTable, 0));
+		insert(hashByState, statePair);
+	}
+
+	hashBySymbol = cast(HashTable, statePair->value);
+
+	assert(hashBySymbol);
+
+	struct Pair * symbolPair = search(hashBySymbol, symbol);
+
+	if (!isOf(symbolPair, Pair))
+	{
+		printf("origin:\n\n");
+		printf("%s\n\n", toString(state)->text);
+		printf("symbol: ");
+		printf("%s\n\n", toString(symbol)->text);
+		printf("target:\n\n");
+		printf("%s\n======================================================\n", toString(targetState)->text);
+		symbolPair = new (Pair, symbol, targetState);
 	}
 }
 
