@@ -25,12 +25,21 @@ int main()
 
 	struct Set * grammar = new (Set, 0);
 
-	insert(grammar, new (Production, "E->{E}+{T}"));
+	/*insert(grammar, new (Production, "E->{E}+{T}"));
 	insert(grammar, new (Production, "E->{T}"));
 	insert(grammar, new (Production, "T->{T}*{F}"));
 	insert(grammar, new (Production, "T->{F}"));
 	insert(grammar, new (Production, "F->({E})"));
-	insert(grammar, new (Production, "F->id"));
+	insert(grammar, new (Production, "F->id"));*/
+
+	insert(grammar, new(Production, "regexp->{regexp}|{concat}", 0));
+	insert(grammar, new(Production, "regexp->{concat}", 0));
+	insert(grammar, new(Production, "concat->{concat}{repeat}", 0));
+	insert(grammar, new(Production, "concat->{repeat}", 0));
+	insert(grammar, new(Production, "repeat->{unit}", 0));
+	insert(grammar, new(Production, "repeat->{unit}*", 0));
+	insert(grammar, new(Production, "unit->({regexp})", 0));
+	insert(grammar, new(Production, "unit->[a-zA-Z0-9]", 0));
 	
 
 	void * slrAutomata = new (SlrAutomata, grammar, 0);

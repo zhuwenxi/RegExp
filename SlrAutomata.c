@@ -29,7 +29,8 @@ const void * Action;
 
 
 
-static void * constructGoto(struct SlrAutomata * automata);
+static struct Action * action(const void * _automata, const void * _state, const void * _action);
+static void * constructStates(struct SlrAutomata * automata);
 static struct Set * initGrammar();
 static struct Set * initGrammarSymbol(struct Set * grammar);
 static void updateGoto(struct SlrAutomata * slrAutomata, struct Set * state, struct ProductionToken * symbol, struct Set * targetState);
@@ -40,16 +41,17 @@ static struct ProductionToken * tokenNextToDot(struct Production * production);
 static struct Set * items(const void * _automata, const void * _state, const void * _token);
 static struct Set * closure(struct Set * state, struct Set * grammar);
 static struct Production * getInitialItem(struct Set * grammar);
+static void * queryTwoStageHashTable(const void * _hashTable, const void * _state, const void * _symbol);
 
 
 
 
 static void * SlrAutomata_ctor(void * _self, va_list * args)
 {
-	// Init self->GOTO and self->ACTION:
 	struct SlrAutomata * self = cast(SlrAutomata, _self);
 	assert(self);
 
+	// Init self->GOTO and self->ACTION:
 	self->GOTO = new(HashTable, 0);
 	self->ACTION = new(HashTable, 0);
 
@@ -66,8 +68,10 @@ static void * SlrAutomata_ctor(void * _self, va_list * args)
 		((struct Automata *)self)->grammar = initGrammar();
 	}
 	
+	// Init self->states:
+	((struct Automata *)self)->states = constructStates(_self);
 
-	struct Set * states = constructGoto(_self);
+	constructAction(self);
 
 	return _self;
 }
@@ -118,6 +122,22 @@ static struct Set * initGrammarSymbol(struct Set * grammar)
 	delete(iterator);
 
 	return grammarSymbol;
+}
+
+static struct Action * action(const void * _automata, const void * _state, const void * _symbol)
+{
+	const struct SlrAutomata * automata = cast(SlrAutomata, _automata);
+	const struct Set * state = cast(Set, _state);
+	const struct ProductionToken * symbol = cast(ProductionToken, _symbol);
+
+	if (automata && state && symbol)
+	{
+		
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 static struct Set * closure(struct Set * state, struct Set * grammar)
@@ -209,7 +229,7 @@ static struct Set * items(const void * _automata, const void * _state, const voi
 	}
 }
 
-static void * constructGoto(struct SlrAutomata * automata)
+static void * constructStates(struct SlrAutomata * automata)
 {
 	struct Set * states = new (Set, 0);
 	struct Set * state0 = new (Set, 0);
@@ -484,6 +504,11 @@ static struct Production * getInitialItem(struct Set * grammar)
 	{
 		return NULL;
 	}
+}
+
+static void * queryTwoStageHashTable(const void * _hashTable, const void * _state, const void * _symbol)
+{
+	return NULL;
 }
 
 
