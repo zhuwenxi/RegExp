@@ -24,6 +24,7 @@
  * Declarations:
  */
 const void * SlrAutomata;
+const void * Action;
 
 
 
@@ -36,6 +37,8 @@ static void constructAction(struct SlrAutomata * slrAutomata);
 static struct Set * extractGrammarSymbol(const struct Production * prod);
 static void addDotPrefix(struct Set * grammar);
 static struct ProductionToken * tokenNextToDot(struct Production * production);
+static struct Set * items(const void * _automata, const void * _state, const void * _token);
+static struct Set * closure(struct Set * state, struct Set * grammar);
 
 
 
@@ -64,42 +67,7 @@ static void * SlrAutomata_dtor(void * _self)
 
 static void * SlrAutomata_transfor(const void * _automata, const void * _state, const void * _token)
 {
-	struct Set * state = cast(Set, _state);
-	struct ProductionToken * token = cast(ProductionToken, _token);
-
-	assert(state && token);
-
-	struct Set * targetState = new (Set, 0);
-
-	struct SetIterator * iter = new (SetIterator, state, 0);
-	struct Production * prod;
-
-	for (prod = start(iter); prod != end(iter); prod = next(iter))
-	{
-		struct ProductionToken * nextToken = tokenNextToDot(prod);
-
-		if (nextToken && equals(nextToken, token))
-		{
-			struct Production * nextProduction = clone(prod);
-
-			int indexOfNextToken = indexOf(prod->body, nextToken);
-			swap(nextProduction->body, indexOfNextToken, indexOfNextToken - 1);
-
-			insert(targetState, nextProduction);
-		}
-	}
-
-	delete(prod);
-
-	if (targetState->length)
-	{
-		return targetState;
-	}
-	else
-	{
-		return NULL;
-	}
-	
+	return NULL;
 }
 
 static struct Set * initGrammar()
@@ -190,6 +158,45 @@ static struct Set * closure(struct Set * state, struct Set * grammar)
 	return state;
 }
 
+static struct Set * items(const void * _automata, const void * _state, const void * _token)
+{
+	struct Set * state = cast(Set, _state);
+	struct ProductionToken * token = cast(ProductionToken, _token);
+
+	assert(state && token);
+
+	struct Set * targetState = new (Set, 0);
+
+	struct SetIterator * iter = new (SetIterator, state, 0);
+	struct Production * prod;
+
+	for (prod = start(iter); prod != end(iter); prod = next(iter))
+	{
+		struct ProductionToken * nextToken = tokenNextToDot(prod);
+
+		if (nextToken && equals(nextToken, token))
+		{
+			struct Production * nextProduction = clone(prod);
+
+			int indexOfNextToken = indexOf(prod->body, nextToken);
+			swap(nextProduction->body, indexOfNextToken, indexOfNextToken - 1);
+
+			insert(targetState, nextProduction);
+		}
+	}
+
+	delete(prod);
+
+	if (targetState->length)
+	{
+		return targetState;
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
 static void * initStates(struct SlrAutomata * automata)
 {
 	struct Set * states = new (Set, 0);
@@ -228,7 +235,7 @@ static void * initStates(struct SlrAutomata * automata)
 			{
 				struct ProductionToken * symbol = grammarSymbol->items[symbolIndex];
 
-				struct Set * newState = transfor(automata, state, symbol);
+				struct Set * newState = items(automata, state, symbol);
 				
 				if (newState)
 				{
@@ -255,7 +262,7 @@ static void * initStates(struct SlrAutomata * automata)
 	} while (statesLength != states->length);
 
 	
-	/*int i;
+	int i;
 
 	for (i = 0; i < states->length; i++)
 	{
@@ -263,7 +270,7 @@ static void * initStates(struct SlrAutomata * automata)
 		struct String * str = toString(state);
 		printf("state %d:\n\n%s\n==========================\n", i, str->text);
 		delete(str);
-	}*/
+	}
 
 	return states;
 }
@@ -295,19 +302,69 @@ static void updateGoto(struct SlrAutomata * slrAutomata, struct Set * _state, st
 
 	if (!isOf(symbolPair, Pair))
 	{
-		printf("origin:\n\n");
+		/*printf("origin:\n\n");
 		printf("%s\n\n", toString(state)->text);
 		printf("symbol: ");
-		printf("%s\n\n", toString(symbol)->text);
+		printf("\"%s\"\n\n", toString(symbol)->text);
 		printf("target:\n\n");
-		printf("%s\n======================================================\n", toString(targetState)->text);
+		printf("%s\n======================================================\n", toString(targetState)->text);*/
 		symbolPair = new (Pair, symbol, targetState);
 	}
 }
 
-static void constructAction(struct SlrAutomata * slrAutomata)
+static void constructAction(struct SlrAutomata * _slrAutomata)
 {
+	struct SlrAutomata * slrAutomata = cast(SlrAutomata, _slrAutomata);
 
+
+	if (slrAutomata)
+	{
+		struct HashTable * GOTO = cast(HashTable, slrAutomata->GOTO);
+		
+		if (GOTO)
+		{
+			
+		}
+		else
+		{
+			return;
+		}
+	}
+	else
+	{
+		return;
+	}
+}
+
+static void updateAction(struct SlrAutomata * _slrAutomata, struct Set * _state, struct ProductionToken * _symbol, struct Action * action)
+{
+	struct HashTable * ACTION = cast(HashTable, _slrAutomata->ACTION);
+	
+	if (ACTION)
+	{
+		struct Set * state = clone(_state);
+		struct Set * symbol = clone(_symbol);
+
+		struct Pair * statePair = search(ACTION, state);
+		struct HashTable * hashBySymbol;
+
+		if (!statePair)
+		{
+			statePair = new (Pair, state, new (HashTable, 0));
+			insert(ACTION, statePair);
+		}
+
+		hashBySymbol = cast(HashTable, statePair->value);
+
+		assert(hashBySymbol);
+
+		struct Pair * symbolPair = search(hashBySymbol, symbol);
+
+		if (!isOf(symbolPair, Pair))
+		{
+			symbolPair = new (Pair, symbol, action);
+		}
+	}
 }
 
 static struct Set * extractGrammarSymbol(const struct Production * prod)
@@ -384,5 +441,10 @@ void loadSlrAutomata()
 	if (!SlrAutomata)
 	{
 		SlrAutomata = new (AutomataClass, "SlrAutomata", Automata, sizeof(struct SlrAutomata), ctor, SlrAutomata_ctor, dtor, SlrAutomata_dtor, transfor, SlrAutomata_transfor,0);
+	}
+
+	if (!Action)
+	{
+		Action = NULL;
 	}
 }

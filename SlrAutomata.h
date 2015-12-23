@@ -10,6 +10,6 @@
 
 extern const void * SlrAutomata;
 
-extern const void * State;
+extern const void * Action;
 
 #endif

@@ -16,4 +16,10 @@ struct SlrAutomata
 	struct HashTable * ACTION;
 };
 
+struct Action
+{
+	struct Object _;
+	int type;
+};
+
 #endif
