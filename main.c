@@ -23,31 +23,17 @@ int main()
 {
 	loadRegexp();
 
-	/*void * set = new (Set, 0);
-	struct SetIterator * delegate = new (SetIterator, set, 0);
-	struct Iterator * iter;
-	struct String * text;
+	struct Set * grammar = new (Set, 0);
 
-	insert(set, new (String, "FILE"));
-	insert(set, new (String, "EDIT"));
-	insert(set, new (String, "VIEW"));
-
-	struct String * s = start(delegate);
-	struct String * e = end(delegate);
-
-
-	for (iter = start(delegate); iter != end(delegate); iter = next(delegate))
-	{
-		text = toString(iter);
-
-		printf("%s\n", text->text);
-
-		delete(text);
-		
-	}*/
+	insert(grammar, new (Production, "E->{E}+{T}"));
+	insert(grammar, new (Production, "E->{T}"));
+	insert(grammar, new (Production, "T->{T}*{F}"));
+	insert(grammar, new (Production, "T->{F}"));
+	insert(grammar, new (Production, "F->({E})"));
+	insert(grammar, new (Production, "F->id"));
 	
 
-	void * slrAutomata = new (SlrAutomata, 0);
+	void * slrAutomata = new (SlrAutomata, grammar, 0);
 
 	delete(slrAutomata);
 

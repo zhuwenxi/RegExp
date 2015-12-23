@@ -29,7 +29,7 @@ const void * Action;
 
 
 
-static void * initStates(struct SlrAutomata * automata);
+static void * constructGoto(struct SlrAutomata * automata);
 static struct Set * initGrammar();
 static struct Set * initGrammarSymbol(struct Set * grammar);
 static void updateGoto(struct SlrAutomata * slrAutomata, struct Set * state, struct ProductionToken * symbol, struct Set * targetState);
@@ -39,23 +39,35 @@ static void addDotPrefix(struct Set * grammar);
 static struct ProductionToken * tokenNextToDot(struct Production * production);
 static struct Set * items(const void * _automata, const void * _state, const void * _token);
 static struct Set * closure(struct Set * state, struct Set * grammar);
+static struct Production * getInitialItem(struct Set * grammar);
 
 
 
 
 static void * SlrAutomata_ctor(void * _self, va_list * args)
 {
+	// Init self->GOTO and self->ACTION:
 	struct SlrAutomata * self = cast(SlrAutomata, _self);
-
 	assert(self);
 
 	self->GOTO = new(HashTable, 0);
 	self->ACTION = new(HashTable, 0);
 
-	struct Set * states = initStates(_self);
 
-	/*struct String * gotoString = toString(self->GOTO);
-	printf("%s\n", gotoString->text);*/
+	// Init self->grammar:
+	struct Set * grammar = va_arg(*args, struct Set *);
+	if (grammar)
+	{
+		((struct Automata *)self)->grammar = grammar;
+	}
+	else
+	{
+		// If no grammar specificed, use default grammar.
+		((struct Automata *)self)->grammar = initGrammar();
+	}
+	
+
+	struct Set * states = constructGoto(_self);
 
 	return _self;
 }
@@ -74,7 +86,7 @@ static struct Set * initGrammar()
 {
 	struct Set * grammar = new (Set, 0);
 
-	insert(grammar, new(Production, "regexp'->{regexp}", 0));
+	// insert(grammar, new(Production, "regexp'->{regexp}", 0));
 	insert(grammar, new(Production, "regexp->{regexp}|{concat}", 0));
 	insert(grammar, new(Production, "regexp->{concat}", 0));
 	insert(grammar, new(Production, "concat->{concat}{repeat}", 0));
@@ -197,15 +209,20 @@ static struct Set * items(const void * _automata, const void * _state, const voi
 	}
 }
 
-static void * initStates(struct SlrAutomata * automata)
+static void * constructGoto(struct SlrAutomata * automata)
 {
 	struct Set * states = new (Set, 0);
 	struct Set * state0 = new (Set, 0);
-	struct Set * grammar = initGrammar();
+	struct Set * grammar = ((struct Automata *)automata)->grammar;
 
 	struct Set * grammarSymbol = initGrammarSymbol(grammar);
 
-	struct Production * initialItem = new (Production, "regexp'->{regexp}", 0);
+	struct Production * initialItem = getInitialItem(grammar);
+
+	if (!initialItem)
+	{
+		return;
+	}
 	
 	int stateIndex;
 	int productionIndex;
@@ -430,6 +447,43 @@ static struct ProductionToken * tokenNextToDot(struct Production * production)
 	delete(dot);
 
 	return NULL;
+}
+
+static struct Production * getInitialItem(struct Set * grammar)
+{
+	if (grammar && grammar->length)
+	{
+		struct Production * firstItem = cast(Production, grammar->items[0]);
+
+		if (firstItem)
+		{
+			struct String * head = new (String, firstItem->head->text->text, 0);
+			struct String * singleQuote = new (String, "'", 0);
+			struct String * arrow = new (String, "->", 0);
+			struct String * leftBrace = new (String, "{", 0);
+			struct String * body = new (String, firstItem->head->text->text);
+			struct String * rightBrace = new (String, "}", 0);
+
+			struct String * productionString = add(head, singleQuote, arrow, leftBrace, body, rightBrace,0);
+
+			delete(head);
+			delete(singleQuote);
+			delete(arrow);
+			delete(body);
+			delete(leftBrace);
+			delete(rightBrace);
+
+			return new (Production, productionString->text, 0);
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 
