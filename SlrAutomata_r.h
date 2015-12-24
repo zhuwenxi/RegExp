@@ -19,7 +19,12 @@ struct SlrAutomata
 struct Action
 {
 	struct Object _;
-	int type;
+	bool isShift;
+	bool isReduce;
+	bool isAccept;
+	bool isError;
+	struct Set * stateToShift;
+	struct ProductionToken * productionToReduce;
 };
 
 #endif
