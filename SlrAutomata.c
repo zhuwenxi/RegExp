@@ -365,7 +365,7 @@ static struct Set * first(struct Set * _grammar, struct ProductionToken * _symbo
 
 	if (grammar && symbol)
 	{
-		// printf("symbol: %s\n", symbol->text->text);
+		//printf("symbol: %s\n", symbol->text->text);
 
 		struct Set * firstSet = new (Set, 0);
 
@@ -382,7 +382,7 @@ static struct Set * first(struct Set * _grammar, struct ProductionToken * _symbo
 			{
 				struct Production * production = cast(Production, grammar->items[productionIndex]);
 				assert(production);
-				// printf("production: %s\n", toString(production)->text);
+				//printf("production: %s\n", toString(production)->text);
 
 				if (equals(production->head, symbol))
 				{
@@ -417,7 +417,7 @@ static struct Set * first(struct Set * _grammar, struct ProductionToken * _symbo
 							int i;
 							for (i = 0; i < firstSetOfCurrentToken->length; i++)
 							{
-								if (!search(firstSet, firstSetOfCurrentToken->items[i]))
+								if (!search(firstSet, firstSetOfCurrentToken->items[i]) && !equals(firstSetOfCurrentToken->items[i], epsilon))
 								{
 									insert(firstSet, clone(firstSetOfCurrentToken->items[i]));
 								}
@@ -447,7 +447,7 @@ static struct Set * first(struct Set * _grammar, struct ProductionToken * _symbo
 		}
 
 		
-		// printf("return set: %s\n", toString(firstSet)->text);
+		//printf("return set: %s\n", toString(firstSet)->text);
 		return firstSet;
 	}
 	else
