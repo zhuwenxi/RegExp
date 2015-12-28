@@ -45,7 +45,7 @@ static struct Set * closure(struct Set * state, struct Set * grammar);
 static struct Production * getInitialItem(struct Set * grammar);
 static void * queryTwoStageHashTable(const void * _hashTable, const void * _state, const void * _symbol);
 static struct Production * searchFinishedProduction(const struct Set * _state);
-static struct Set * follow(struct Set * grammar, struct ProductionToken * symbol);
+static struct Set * follow(const struct Set * grammar, const struct ProductionToken * symbol);
 static struct Set * first(struct Set * grammar, struct ProductionToken * symbol);
 
 
@@ -245,23 +245,216 @@ static struct Set * items(const void * _automata, const void * _state, const voi
 	}
 }
 
-static struct Set * follow(struct Set * grammar, struct ProductionToken * symbol)
+static struct Set * follow(const struct Set * _grammar, const struct ProductionToken * _symbol)
 {
-	struct Set * followSet = new (Set, 0);
+	struct Set * grammar = cast(Set, _grammar);
+	struct ProductionToken * symbol = cast(ProductionToken, _symbol);
 
-	// Add "$" to the followSet;
-	struct ProductionToken * dollarSymbol = new (ProductionToken, new (String, "$", 0), 0);
-	dollarSymbol->isFlag = true;
-	insert(followSet, dollarSymbol);
+	if (grammar && symbol)
+	{
+		struct Set * followSet = new (Set, 0);
 
-	return followSet;
+		// 1. Place $ in FOLLOW(S), where S is a start symbol;
+		if (symbol->isNonterminal)
+		{
+			// Cosntruct the "$" symbol.
+			struct ProductionToken * dollarSymbol = new (ProductionToken, new (String, "$", 0), 0);
+			dollarSymbol->isFlag = true;
+
+			insert(followSet, dollarSymbol);
+		}
+
+		int i;
+		for (i = 0; i < grammar->length; i++)
+		{
+			struct Production * production = cast(Production, grammar->items[i]);
+
+			assert(production);
+
+			if (search(production->body, symbol))
+			{
+				struct ProductionToken * nextToken = tokenNext(production, symbol);
+
+				// The "epsilon" token:
+				struct ProductionToken * epsilon = new (ProductionToken, new (String, "epsilon", 0), false, 0);
+				epsilon->isFlag = true;
+
+				// FIRST(beta):
+				struct Set * firstBeta = first(grammar, nextToken);
+
+				if (nextToken)
+				{
+					int indexFirstBeta;
+					for (indexFirstBeta = 0; indexFirstBeta < firstBeta->length; indexFirstBeta++)
+					{
+						struct ProductionToken * followBetaItem = cast(ProductionToken, firstBeta->items[indexFirstBeta]);
+
+						assert(followBetaItem);
+
+						if (!equals(epsilon, followBetaItem))
+						{
+							// If there is a production A->alpha B beta, then everything in FIRST(beta) except epsilon is in FOLLOW(B);
+							if (!search(followSet, followBetaItem))
+							{
+								insert(followSet, clone(followBetaItem));
+							}
+						}
+						else
+						{
+							// If there is a production A -> alpha B beta, where FIRST(beta) contains epsilon, then add everything in FOLLOW(A) is in FOLLOW(B);
+							struct Set * followA = follow(grammar, production->head);
+
+							int indexFollowA;
+							for (indexFollowA = 0; indexFollowA < followA->length; indexFollowA ++)
+							{
+								if (!search(followSet, followA->items[indexFollowA]))
+								{
+									insert(followSet, clone(followA->items[indexFollowA]));
+								}
+							}
+
+							delete(followA);
+						}
+					}
+
+					
+				}
+				else
+				{
+					// If there is a production A -> alpha B, where FIRST(beta) contains epsilon, then add everything in FOLLOW(A) is in FOLLOW(B).
+					struct Set * followA = follow(grammar, production->head);
+
+					int indexFollowA;
+					for (indexFollowA = 0; indexFollowA < followA->length; indexFollowA++)
+					{
+						if (!search(followSet, followA->items[indexFollowA]))
+						{
+							insert(followSet, clone(followA->items[indexFollowA]));
+						}
+					}
+
+					delete(followA);
+				}
+
+				delete(firstBeta);
+				delete(epsilon);
+			}
+		}
+		
+		/*if (!strcmp(symbol->text->text, "E"))
+		{
+			printf("+++++++++++++++++++++++++++++++\n");
+			printf("FOLLOW(%s): ", toString(symbol)->text);
+			printf("%s\n", toString(followSet)->text);
+			printf("-------------------------------\n");
+		}*/
+		
+
+		return followSet;
+	}
+	else
+	{
+		return NULL;
+	}	
 }
 
-static struct Set * first(struct Set * grammar, struct ProductionToken * symbol)
+static struct Set * first(struct Set * _grammar, struct ProductionToken * _symbol)
 {
-	struct Set * firstSet = new (Set, 0);
+	struct Set * grammar = cast(Set, _grammar);
+	struct ProductionToken * symbol = cast(ProductionToken, _symbol);
 
-	return firstSet;
+	if (grammar && symbol)
+	{
+		// printf("symbol: %s\n", symbol->text->text);
+
+		struct Set * firstSet = new (Set, 0);
+
+		if (symbol->isTerminal)
+		{
+			// If X is terminal, then FIRST(X) = {X}:
+			insert(firstSet, clone(symbol));
+		}
+		else
+		{
+			int productionIndex;
+
+			for (productionIndex = 0; productionIndex < grammar->length; productionIndex++)
+			{
+				struct Production * production = cast(Production, grammar->items[productionIndex]);
+				assert(production);
+				// printf("production: %s\n", toString(production)->text);
+
+				if (equals(production->head, symbol))
+				{
+					int tokenIndex;
+					for (tokenIndex = 0; tokenIndex < production->body->length; tokenIndex ++)
+					{
+						struct ProductionToken * token = cast(ProductionToken, production->body->items[tokenIndex]);
+
+						assert(token);
+
+
+						// if X -> epsilon is a production, then add epsilon to FIRST(X):
+
+						struct ProductionToken * epsilon = new (ProductionToken, new (String, "epsilon", 0), false, 0);
+						epsilon->isFlag = true;
+
+						if (equals(token, epsilon) && production->body->length == 1)
+						{
+							if (!search(firstSet, epsilon))
+							{
+								insert(firstSet, clone(epsilon));
+							}
+						} 
+
+						/* Hack here: don't call first resursively when "token" equals to "symbol", to avoid infinite recursion.
+						 * For example: E -> E + T.
+						 */
+						if (!equals(token, symbol))
+						{
+							struct Set * firstSetOfCurrentToken = first(grammar, token);
+
+							int i;
+							for (i = 0; i < firstSetOfCurrentToken->length; i++)
+							{
+								if (!search(firstSet, firstSetOfCurrentToken->items[i]))
+								{
+									insert(firstSet, clone(firstSetOfCurrentToken->items[i]));
+								}
+							}
+
+							if (!search(firstSetOfCurrentToken, epsilon))
+							{
+								delete(firstSetOfCurrentToken);
+								break;
+							}
+							else
+							{
+								delete(firstSetOfCurrentToken);
+							}
+						}
+						else
+						{
+							break;
+						}
+
+
+						delete(epsilon);
+						
+					}
+				}
+			}
+		}
+
+		
+		// printf("return set: %s\n", toString(firstSet)->text);
+		return firstSet;
+	}
+	else
+	{
+		return NULL;
+	}
+	
 }
 
 static void * constructStates(struct SlrAutomata * automata)
@@ -424,6 +617,7 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 					struct Production * finishedProduction = searchFinishedProduction(state);
 
 					struct Production * initialProduction = getInitialItem(((struct Automata *)slrAutomata)->grammar);
+					assert(initialProduction && initialProduction->body);
 
 					struct ProductionToken * dot = new (ProductionToken, new (String, "DOT", 0), false, 0);
 					dot->isFlag = true;
@@ -432,6 +626,7 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 					// Reduce:
 					if (finishedProduction)
 					{
+						//printf("~~~~~~~~~~~~~\n%s\n~~~~~~~~~~~~~~~\n", toString(initialProduction)->text);
 						if (!equals(initialProduction, finishedProduction) && search(follow(((struct Automata *)slrAutomata)->grammar, finishedProduction->head), symbol))
 						{
 							// "Reduce A->alpha".
@@ -729,4 +924,26 @@ void loadSlrAutomata()
 	{
 		Action = new (Class, "Action", Object, sizeof(struct Action), 0);
 	}
+}
+
+
+
+
+/*
+ * Test suites:
+ */
+
+struct Set * test_initGrammarSymbol(struct Set * grammar)
+{
+	return initGrammarSymbol(grammar);
+}
+
+struct Set * test_follow(struct Set * grammar, struct ProductionToken * symbol)
+{
+	return follow(grammar, symbol);
+}
+
+struct Set * test_first(struct Set * grammar, struct ProductionToken * symbol)
+{
+	return first(grammar, symbol);
 }
