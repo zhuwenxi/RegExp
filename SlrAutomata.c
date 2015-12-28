@@ -75,7 +75,7 @@ static void * SlrAutomata_ctor(void * _self, va_list * args)
 	
 	// Init self->states:
 	((struct Automata *)self)->states = constructStates(_self);
-
+	//printf("GOTO:\n\n%s\n", toString(self->GOTO)->text);
 	constructAction(self);
 
 	return _self;
@@ -527,7 +527,7 @@ static void * constructStates(struct SlrAutomata * automata)
 	} while (statesLength != states->length);
 
 	
-	int i;
+	/*int i;
 
 	for (i = 0; i < states->length; i++)
 	{
@@ -535,7 +535,7 @@ static void * constructStates(struct SlrAutomata * automata)
 		struct String * str = toString(state);
 		printf("state %d:\n\n%s\n==========================\n", i, str->text);
 		delete(str);
-	}
+	}*/
 
 	return states;
 }
@@ -547,7 +547,7 @@ static void updateGoto(struct SlrAutomata * slrAutomata, struct Set * _state, st
 	assert(hashByState);
 
 	struct Set * state = clone(_state);
-	struct Set * symbol = clone(_symbol);
+	struct ProductionToken * symbol = clone(_symbol);
 	struct Set * targetState = clone(_targetState);
 
 	struct Pair * statePair = search(hashByState, state);
@@ -600,6 +600,10 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 				for (symbolIndex = 0; symbolIndex < symbols->length; symbolIndex ++)
 				{
 					struct ProductionToken * symbol = symbols->items[symbolIndex];
+
+					/*printf("state:\n%s\n\n", toString(state)->text);
+					printf("symbol:\n%s\n\n", toString(symbol)->text);*/
+
 					struct Set * nextState = transfor(slrAutomata, state, symbol);
 
 					// Shift:
@@ -609,6 +613,11 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 						struct Action * action = new (Action, 0);
 						action->isShift = true;
 						action->stateToShift = clone(nextState);
+
+						printf("state:\n%s\n\n", toString(state)->text);
+						printf("symbol:\n%s\n\n", toString(symbol)->text);
+						printf("next state:\n%s\n\n", toString(nextState)->text);
+						printf("action: shift\n~~~~~~~~~~~~~~~~~~~~~~\n");
 
 						updateAction(slrAutomata, clone(state), clone(symbol), action);
 					}
@@ -634,6 +643,10 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 							action->isReduce = true;
 							action->productionToReduce = clone(finishedProduction);
 
+							/*printf("state:\n%s\n\n", toString(state)->text);
+							printf("symbol:\n%s\n\n", toString(symbol)->text);
+							printf("action: reduce\n~~~~~~~~~~~~~~~~~~~~~~\n");*/
+
 							updateAction(slrAutomata, clone(state), clone(symbol), action);
 						}
 					}
@@ -647,6 +660,10 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 
 						struct Action * action = new (Action, 0);
 						action->isAccept = true;
+
+						/*printf("state:\n%s\n\n", toString(state)->text);
+						printf("symbol:\n%s\n\n", toString(symbol)->text);
+						printf("action: accept\n~~~~~~~~~~~~~~~~~~~~~~\n");*/
 
 						updateAction(slrAutomata, clone(state), clone(dollarSymbol), action);
 					}
@@ -843,8 +860,9 @@ static void * queryTwoStageHashTable(const void * _hashTable, const void * key1,
 		{
 			struct HashTable * secondStageHashTable = pair->value;
 
-			/*printf("\n2nd HashTable: \n%s\n", toString(secondStageHashTable)->text);*/
-
+			/*printf("key2:\n\n%s\n", toString(key2)->text);
+			printf("\n2nd HashTable: \n\n%s\n", toString(secondStageHashTable)->text);*/
+			
 			struct Pair * secondPair = cast(Pair, search(secondStageHashTable, key2));
 
 			return secondPair ? secondPair->value : NULL;

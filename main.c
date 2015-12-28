@@ -42,7 +42,7 @@ int main()
 	insert(grammar, new(Production, "unit->({regexp})", 0));
 	insert(grammar, new(Production, "unit->[a-zA-Z0-9]", 0));*/
 	
-	struct Set * symbols = test_initGrammarSymbol(grammar);
+	/*struct Set * symbols = test_initGrammarSymbol(grammar);
 
 	int i;
 	for (i = 0; i < symbols->length; i++)
@@ -64,7 +64,7 @@ int main()
 		printf("%s\n", toString(followSet)->text);
 		printf("-------------------------------\n");
 	
-	}
+	}*/
 	
 
 	void * slrAutomata = new (SlrAutomata, grammar, 0);
