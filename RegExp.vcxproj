@@ -44,6 +44,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -68,6 +69,7 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="OOC\Class.c" />
     <ClCompile Include="OOC\HashTable.c" />
+    <ClCompile Include="OOC\Integer.c" />
     <ClCompile Include="OOC\Iterator.c" />
     <ClCompile Include="OOC\LinkList.c" />
     <ClCompile Include="OOC\List.c" />
@@ -89,6 +91,8 @@
     <ClInclude Include="OOC\Class_r.h" />
     <ClInclude Include="OOC\HashTable.h" />
     <ClInclude Include="OOC\HashTable_r.h" />
+    <ClInclude Include="OOC\Integer.h" />
+    <ClInclude Include="OOC\Integer_r.h" />
     <ClInclude Include="OOC\Iterator.h" />
     <ClInclude Include="OOC\Iterator_r.h" />
     <ClInclude Include="OOC\LinkList.h" />

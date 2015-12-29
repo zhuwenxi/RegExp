@@ -16,6 +16,8 @@
 #include "OOC\String.h"
 #include "OOC\HashTable.h"
 #include "OOC\HashTable_r.h"
+#include "OOC\Integer.h"
+#include "OOC\Integer_r.h"
 
 
 
@@ -47,6 +49,8 @@ static void * queryTwoStageHashTable(const void * _hashTable, const void * _stat
 static struct Production * searchFinishedProduction(const struct Set * _state);
 static struct Set * follow(const struct Set * grammar, const struct ProductionToken * symbol);
 static struct Set * first(struct Set * grammar, struct ProductionToken * symbol);
+static void markStatesWithNumber(struct Set * states);
+static struct HashTable * stateNumberMap;
 
 
 
@@ -75,7 +79,8 @@ static void * SlrAutomata_ctor(void * _self, va_list * args)
 	
 	// Init self->states:
 	((struct Automata *)self)->states = constructStates(_self);
-	//printf("GOTO:\n\n%s\n", toString(self->GOTO)->text);
+	markStatesWithNumber(((struct Automata *)self)->states);
+	// printf("GOTO:\n\n%s\n", toString(self->GOTO)->text);
 	constructAction(self);
 
 	return _self;
@@ -510,10 +515,16 @@ static void * constructStates(struct SlrAutomata * automata)
 					{
 						// Add new state into states.
 						insert(states, newState);
-
-						// Update the "goto" hash table.
-						updateGoto(automata, state, symbol, newState);
 					}
+
+					// Log:
+					/*printf("state:\n\n%s\n\n", toString(state)->text);
+					printf("symbol:\n\n%s\n\n", toString(symbol)->text);
+					printf("next state:\n\n%s\n\n", toString(newState)->text);
+					printf("=====================================\n\n");*/
+
+					// Update the "goto" hash table.
+					updateGoto(automata, state, symbol, newState);
 					
 				}
 				else
@@ -614,9 +625,21 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 						action->isShift = true;
 						action->stateToShift = clone(nextState);
 
-						printf("state:\n%s\n\n", toString(state)->text);
+						// log:
+						struct Pair * pair = cast(Pair, search(stateNumberMap, state));
+						assert(pair);
+						struct Integer * intObj = cast(Integer, pair->value);
+						assert(intObj);
+						int sn = intObj->value;
+						printf("state:\n%d\n\n", sn);
 						printf("symbol:\n%s\n\n", toString(symbol)->text);
-						printf("next state:\n%s\n\n", toString(nextState)->text);
+						// printf("next state:\n%s\n\n", toString(nextState)->text);
+						struct Pair * nextPair = cast(Pair, search(stateNumberMap, nextState));
+						assert(nextPair);
+						struct Integer * intObjNext = cast(Integer, nextPair->value);
+						assert(intObjNext);
+						int snNext = intObjNext->value;
+						printf("next state:\n%d\n\n", snNext);
 						printf("action: shift\n~~~~~~~~~~~~~~~~~~~~~~\n");
 
 						updateAction(slrAutomata, clone(state), clone(symbol), action);
@@ -905,6 +928,27 @@ static struct Production * searchFinishedProduction(const struct Set * _state)
 	else
 	{
 		return NULL;
+	}
+}
+
+
+
+static void markStatesWithNumber(struct Set * states)
+{
+	if (!stateNumberMap)
+	{
+		stateNumberMap = new (HashTable, 0);
+	}
+
+	int i;
+	for (i = 0; i < states->length; i++)
+	{
+		struct Set * state = cast(Set, states->items[i]);
+		assert(state);
+
+		struct Pair * pair = new (Pair, clone(state), new (Integer, i, 0));
+
+		insert(stateNumberMap, pair);
 	}
 }
 
