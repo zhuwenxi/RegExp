@@ -599,6 +599,12 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 		struct Set * states = cast(Set, ((struct Automata *)slrAutomata)->states);
 		struct Set * symbols = initGrammarSymbol(((struct Automata *)slrAutomata)->grammar);
 
+		// Add "$" as the end of the input stream.
+		struct ProductionToken * dollarSymbol = new (ProductionToken, new (String, "$", 0), false, 0);
+		dollarSymbol->isFlag = true;
+
+		insert(symbols, dollarSymbol);
+
 		if (GOTO && states && symbols)
 		{
 			int stateIndex;
@@ -626,21 +632,21 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 						action->stateToShift = clone(nextState);
 
 						// log:
-						struct Pair * pair = cast(Pair, search(stateNumberMap, state));
+						/*struct Pair * pair = cast(Pair, search(stateNumberMap, state));
 						assert(pair);
 						struct Integer * intObj = cast(Integer, pair->value);
 						assert(intObj);
 						int sn = intObj->value;
 						printf("state:\n%d\n\n", sn);
 						printf("symbol:\n%s\n\n", toString(symbol)->text);
-						// printf("next state:\n%s\n\n", toString(nextState)->text);
+						 printf("next state:\n%s\n\n", toString(nextState)->text);
 						struct Pair * nextPair = cast(Pair, search(stateNumberMap, nextState));
 						assert(nextPair);
 						struct Integer * intObjNext = cast(Integer, nextPair->value);
 						assert(intObjNext);
 						int snNext = intObjNext->value;
 						printf("next state:\n%d\n\n", snNext);
-						printf("action: shift\n~~~~~~~~~~~~~~~~~~~~~~\n");
+						printf("action: shift\n~~~~~~~~~~~~~~~~~~~~~~\n");*/
 
 						updateAction(slrAutomata, clone(state), clone(symbol), action);
 					}
@@ -670,6 +676,16 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 							printf("symbol:\n%s\n\n", toString(symbol)->text);
 							printf("action: reduce\n~~~~~~~~~~~~~~~~~~~~~~\n");*/
 
+							// log:
+							/*struct Pair * pair = cast(Pair, search(stateNumberMap, state));
+							assert(pair);
+							struct Integer * intObj = cast(Integer, pair->value);
+							assert(intObj);
+							int sn = intObj->value;
+							printf("state:\n%d\n", sn);
+							printf("symbol:\n%s\n", toString(symbol)->text);
+							printf("reduce:\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");*/
+
 							updateAction(slrAutomata, clone(state), clone(symbol), action);
 						}
 					}
@@ -678,8 +694,8 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 					if (search(state, initialProduction))
 					{
 						// "Set ACTION[state, $] to accpet
-						struct ProductionToken * dollarSymbol = new (ProductionToken, new (String, "$", 0), 0);
-						dollarSymbol->isFlag = true;
+						/*struct ProductionToken * dollarSymbol = new (ProductionToken, new (String, "$", 0), 0);
+						dollarSymbol->isFlag = true;*/
 
 						struct Action * action = new (Action, 0);
 						action->isAccept = true;
