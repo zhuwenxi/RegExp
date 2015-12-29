@@ -10,7 +10,7 @@ extern const void * State;
 extern const void * AutomataClass;
 
 void * transfor(const void * automata, const void * state, const void * token);
-
+void * parse(const void * automata, const void * input);
 
 
 

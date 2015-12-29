@@ -24,10 +24,24 @@ void * transfor(const void * _automata, const void * _originState, const void * 
 	return class->transfor(_automata, _originState, _token);
 }
 
+void * parse(const void * _automata, const void * input)
+{
+	struct Object * automata = cast(Object, _automata);
+	struct AutomataClass * class = cast(AutomataClass, automata->class);
+
+	assert(automata && class);
+
+	return class->parse(_automata, input);
+}
 
 
 
-static void * Autamata_transfor(const void * automata, const void * state)
+static void * Automata_transfor(const void * automata, const void * state)
+{
+	return NULL;
+}
+
+static void * Automata_parse(const void * _automata, const void * input)
 {
 	return NULL;
 }
@@ -67,6 +81,6 @@ void loadAutomata()
 
 	if (!Automata)
 	{
-		Automata = new (AutomataClass, "Automata", Object, sizeof(struct Automata), transfor, Autamata_transfor, 0);
+		Automata = new (AutomataClass, "Automata", Object, sizeof(struct Automata), transfor, Automata_transfor, 0);
 	}
 }
