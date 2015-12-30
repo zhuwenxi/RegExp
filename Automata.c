@@ -66,6 +66,10 @@ static void * AutomataClass_ctor(const void * _self, va_list * _args)
 		if (selector == transfor)
 		{
 			self->transfor = method;
+		} 
+		else if (selector == parse)
+		{
+			self->parse = method;
 		}
 	}
 

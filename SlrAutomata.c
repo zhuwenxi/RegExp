@@ -107,6 +107,23 @@ static void * SlrAutomata_transfor(const void * _automata, const void * _state, 
 	return automata ? queryTwoStageHashTable(automata->GOTO, _state, _token) : NULL;
 }
 
+static void * SlrAutomata_parse(const void * _automata, const void * input)
+{
+	struct SlrAutomata * automata = cast(SlrAutomata, _automata);
+
+	if (automata && input)
+	{
+		while (true)
+		{
+
+		}
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
 static struct Set * initGrammar()
 {
 	struct Set * grammar = new (Set, 0);
@@ -153,7 +170,9 @@ static struct Action * action(const void * _automata, const void * _state, const
 
 	if (automata && state && symbol)
 	{
-		
+		struct SlrAutomata * automata = cast(SlrAutomata, _automata);
+
+		return automata ? queryTwoStageHashTable(automata->GOTO, _state, symbol) : NULL;
 	}
 	else
 	{
@@ -946,8 +965,6 @@ static struct Production * searchFinishedProduction(const struct Set * _state)
 		return NULL;
 	}
 }
-
-
 
 static void markStatesWithNumber(struct Set * states)
 {
