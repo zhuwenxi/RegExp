@@ -88,6 +88,12 @@ static void * SlrAutomata_ctor(void * _self, va_list * args)
 
 static void * SlrAutomata_dtor(void * _self)
 {
+	struct SlrAutomata * self = cast(SlrAutomata, _self);
+
+	assert(self);
+	delete(self->GOTO);
+	delete(self->ACTION);
+
 	return _self;
 }
 
@@ -1012,7 +1018,7 @@ void loadSlrAutomata()
 {
 	if (!SlrAutomata)
 	{
-		SlrAutomata = new (AutomataClass, "SlrAutomata", Automata, sizeof(struct SlrAutomata), ctor, SlrAutomata_ctor, dtor, SlrAutomata_dtor, transfor, SlrAutomata_transfor,0);
+		SlrAutomata = new (AutomataClass, "SlrAutomata", Automata, sizeof(struct SlrAutomata), ctor, SlrAutomata_ctor, dtor, SlrAutomata_dtor, transfor, SlrAutomata_transfor, parse, SlrAutomata_parse, 0);
 	}
 
 	if (!Action)
