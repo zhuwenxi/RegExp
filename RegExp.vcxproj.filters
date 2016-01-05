@@ -72,6 +72,9 @@
     <ClCompile Include="OOC\Integer.c">
       <Filter>OOC</Filter>
     </ClCompile>
+    <ClCompile Include="OOC\Stack.c">
+      <Filter>OOC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OOC\Class.h">
@@ -165,6 +168,12 @@
       <Filter>OOC</Filter>
     </ClInclude>
     <ClInclude Include="OOC\Integer_r.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Stack.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Stack_r.h">
       <Filter>OOC</Filter>
     </ClInclude>
   </ItemGroup>

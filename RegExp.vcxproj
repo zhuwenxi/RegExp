@@ -79,6 +79,7 @@
     <ClCompile Include="OOC\OOC.c" />
     <ClCompile Include="OOC\Point.c" />
     <ClCompile Include="OOC\Set.c" />
+    <ClCompile Include="OOC\Stack.c" />
     <ClCompile Include="OOC\String.c" />
     <ClCompile Include="Production.c" />
     <ClCompile Include="Regexp.c" />
@@ -108,6 +109,8 @@
     <ClInclude Include="OOC\Point_r.h" />
     <ClInclude Include="OOC\Set.h" />
     <ClInclude Include="OOC\Set_r.h" />
+    <ClInclude Include="OOC\Stack.h" />
+    <ClInclude Include="OOC\Stack_r.h" />
     <ClInclude Include="OOC\String.h" />
     <ClInclude Include="OOC\String_r.h" />
     <ClInclude Include="Production.h" />
