@@ -24,7 +24,7 @@ struct Action
 	bool isAccept;
 	bool isError;
 	struct Set * stateToShift;
-	struct ProductionToken * productionToReduce;
+	struct Production * productionToReduce;
 };
 
 #endif

@@ -69,6 +69,7 @@ static void * ProductionToken_clone(const void * self)
 
 	struct ProductionToken * copy = new (ProductionToken, text, token->isTerminal, 0);
 	copy->isFlag = token->isFlag;
+	copy->isCollection = token->isCollection;
 
 	return copy;
 }
@@ -300,7 +301,8 @@ static struct Set * createBody(char *bodyText)
 			void * text = new (String, start + 1, end - start - 2, 0);
 			bool isTerminal = true;
 
-			void * token = new (ProductionToken, text, isTerminal, 0);
+			struct ProductionToken * token = new (ProductionToken, text, isTerminal, 0);
+			token->isCollection = true;
 
 			insert(body, token);
 

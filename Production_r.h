@@ -20,6 +20,7 @@ struct ProductionToken
 	bool isTerminal;
 	bool isNonterminal;
 	bool isFlag;
+	bool isCollection;
 };
 
 

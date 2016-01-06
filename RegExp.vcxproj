@@ -78,6 +78,7 @@
     <ClCompile Include="OOC\Object.c" />
     <ClCompile Include="OOC\OOC.c" />
     <ClCompile Include="OOC\Point.c" />
+    <ClCompile Include="OOC\Queue.c" />
     <ClCompile Include="OOC\Set.c" />
     <ClCompile Include="OOC\Stack.c" />
     <ClCompile Include="OOC\String.c" />
@@ -107,6 +108,8 @@
     <ClInclude Include="OOC\OOC.h" />
     <ClInclude Include="OOC\Point.h" />
     <ClInclude Include="OOC\Point_r.h" />
+    <ClInclude Include="OOC\Queue.h" />
+    <ClInclude Include="OOC\Queue_r.h" />
     <ClInclude Include="OOC\Set.h" />
     <ClInclude Include="OOC\Set_r.h" />
     <ClInclude Include="OOC\Stack.h" />

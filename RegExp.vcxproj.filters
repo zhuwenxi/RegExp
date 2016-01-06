@@ -75,6 +75,9 @@
     <ClCompile Include="OOC\Stack.c">
       <Filter>OOC</Filter>
     </ClCompile>
+    <ClCompile Include="OOC\Queue.c">
+      <Filter>OOC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OOC\Class.h">
@@ -174,6 +177,12 @@
       <Filter>OOC</Filter>
     </ClInclude>
     <ClInclude Include="OOC\Stack_r.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Queue.h">
+      <Filter>OOC</Filter>
+    </ClInclude>
+    <ClInclude Include="OOC\Queue_r.h">
       <Filter>OOC</Filter>
     </ClInclude>
   </ItemGroup>

@@ -18,6 +18,10 @@
 #include "OOC\HashTable_r.h"
 #include "OOC\Integer.h"
 #include "OOC\Integer_r.h"
+#include "OOC\Queue.h"
+#include "OOC\Queue_r.h"
+#include "OOC\Stack.h"
+#include "OOC\Stack_r.h"
 
 
 
@@ -49,6 +53,9 @@ static void * queryTwoStageHashTable(const void * _hashTable, const void * _stat
 static struct Production * searchFinishedProduction(const struct Set * _state);
 static struct Set * follow(const struct Set * grammar, const struct ProductionToken * symbol);
 static struct Set * first(struct Set * grammar, struct ProductionToken * symbol);
+static void * initInputQueue(const void * input);
+static void * initStateStack(const void * states);
+static bool popSymbolsOffStack(const struct Production * production);
 static void markStatesWithNumber(struct Set * states);
 static struct HashTable * stateNumberMap;
 
@@ -82,6 +89,7 @@ static void * SlrAutomata_ctor(void * _self, va_list * args)
 	markStatesWithNumber(((struct Automata *)self)->states);
 	// printf("GOTO:\n\n%s\n", toString(self->GOTO)->text);
 	constructAction(self);
+	// printf("ACTION:\n\n%s\n", toString(self->ACTION)->text);
 
 	return _self;
 }
@@ -119,10 +127,58 @@ static void * SlrAutomata_parse(const void * _automata, const void * input)
 
 	if (automata && input)
 	{
+		struct Queue * inputQueue = initInputQueue(input);
+		struct Stack * stateStack = initStateStack(((struct Automata *)automata)->states);
+
+		// printf("%s\n", toString(inputQueue)->text);
+		
+		struct Set * state = top(stateStack);
+		struct ProductionToken * symbol;
+		struct Action * nextAction;
+
 		while (true)
 		{
+			symbol = clone(dequeue(inputQueue));
 
+			printf("%s\n", toString(state)->text);
+			printf("%s\n============================\n", toString(symbol)->text);
+
+			nextAction = action(automata, state, symbol);
+			
+			assert(nextAction);
+
+			if (nextAction->isShift)
+			{
+				struct Set * stateToShift = clone(nextAction->stateToShift);
+				
+				push(stateStack, stateToShift);
+				
+				symbol = dequeue(inputQueue);
+			}
+			else if (nextAction->isReduce)
+			{
+				popSymbolsOffStack(nextAction->productionToReduce);
+
+				pop(stateStack);
+				push(stateStack, clone(transfor(automata, state, nextAction->productionToReduce->head)));
+			}
+			else if (nextAction->isAccept)
+			{
+				// 
+				// Parsing is done!
+				//
+				break;
+			}
+			else if (nextAction->isError)
+			{
+				//
+				// Error!
+				// TO DO: call error-recovery routine.
+				//
+				break;
+			}
 		}
+		
 	}
 	else
 	{
@@ -178,7 +234,7 @@ static struct Action * action(const void * _automata, const void * _state, const
 	{
 		struct SlrAutomata * automata = cast(SlrAutomata, _automata);
 
-		return automata ? queryTwoStageHashTable(automata->GOTO, _state, symbol) : NULL;
+		return automata ? queryTwoStageHashTable(automata->ACTION, _state, symbol) : NULL;
 	}
 	else
 	{
@@ -647,6 +703,7 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 					printf("symbol:\n%s\n\n", toString(symbol)->text);*/
 
 					struct Set * nextState = transfor(slrAutomata, state, symbol);
+					bool hasAction = false;
 
 					// Shift:
 					if (nextState)
@@ -674,6 +731,8 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 						printf("action: shift\n~~~~~~~~~~~~~~~~~~~~~~\n");*/
 
 						updateAction(slrAutomata, clone(state), clone(symbol), action);
+
+						hasAction = true;
 					}
 
 					
@@ -712,6 +771,8 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 							printf("reduce:\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");*/
 
 							updateAction(slrAutomata, clone(state), clone(symbol), action);
+
+							hasAction = true;
 						}
 					}
 					
@@ -730,6 +791,19 @@ static void constructAction(struct SlrAutomata * _slrAutomata)
 						printf("action: accept\n~~~~~~~~~~~~~~~~~~~~~~\n");*/
 
 						updateAction(slrAutomata, clone(state), clone(dollarSymbol), action);
+
+						hasAction = true;
+					}
+
+					// Error:
+					if (!hasAction)
+					{
+						struct Action * action = new (Action, 0);
+						action->isError = true;
+
+						updateAction(slrAutomata, clone(state), clone(symbol), action);
+
+						hasAction = true;
 					}
 					
 				}
@@ -745,7 +819,7 @@ static void updateAction(struct SlrAutomata * _slrAutomata, struct Set * _state,
 	if (ACTION)
 	{
 		struct Set * state = clone(_state);
-		struct Set * symbol = clone(_symbol);
+		struct ProductionToken * symbol = clone(_symbol);
 
 		struct Pair * statePair = search(ACTION, state);
 		struct HashTable * hashBySymbol;
@@ -760,17 +834,93 @@ static void updateAction(struct SlrAutomata * _slrAutomata, struct Set * _state,
 
 		assert(hashBySymbol);
 
-		struct Pair * symbolPair = search(hashBySymbol, symbol);
-
-		if (!isOf(symbolPair, Pair))
+		if (!symbol->isCollection)
 		{
-			symbolPair = new (Pair, symbol, action);
+			struct Pair * symbolPair = search(hashBySymbol, symbol);
+
+			if (!isOf(symbolPair, Pair))
+			{
+				symbolPair = new (Pair, symbol, action);
+
+				insert(hashBySymbol, symbolPair);
+
+				/*printf("%s\n", toString(symbolPair)->text);
+				printf("==================\n");
+				printf("%s\n", toString(_slrAutomata->ACTION)->text);
+				printf("~~~~~~~~~~~~~~~~~~\n");*/
+			}
+			else
+			{
+				// Having conflict action here!
+				struct Action * currentAction = cast(Action, symbolPair->value);
+				assert(currentAction);
+
+				assert(equals(currentAction, action));
+			}
 		}
 		else
 		{
-			// Having conflict action here!
-			assert(0);
+			// symbol is a collection, e.g. [a-zA-Z0-9]
+
+			// This is a dirty implementation, it could be improved later if we have time.
+
+			const char * text = symbol->text->text;
+			char * ch = text;
+
+			while (*ch)
+			{
+				
+
+				if (*ch == '-')
+				{
+					char start = *(ch - 1);
+					char end = *(ch + 1);
+
+					while (start <= end)
+					{
+						char str[2];
+						str[0] = start;
+						str[1] = '\0';
+
+						struct ProductionToken * token = new (ProductionToken, new (String, str, 0), true, 0);
+
+						struct Pair * symbolPair = search(hashBySymbol, token);
+						if (!isOf(symbolPair, Pair))
+						{
+							symbolPair = new (Pair, token, clone(action));
+
+							/*printf("%s\n", toString(state)->text);
+							printf("%s\n", toString(token)->text);*/
+							if (!isA(symbolPair->value, Action))
+							{
+								printf("%s\n", ((struct Class *)classOf(symbolPair->value))->name);
+							} 
+							else
+							{
+								printf("OK\n");
+							}
+							insert(hashBySymbol, symbolPair);
+						}
+						else
+						{
+							// Having conflict action here!
+							struct Action * currentAction = cast(Action, symbolPair->value);
+							assert(currentAction);
+
+							assert(equals(currentAction, action));
+						}
+
+						start++;
+					}
+					
+				}
+
+				
+				
+				ch++;
+			}
 		}
+		
 	}
 }
 
@@ -924,11 +1074,11 @@ static void * queryTwoStageHashTable(const void * _hashTable, const void * key1,
 		{
 			struct HashTable * secondStageHashTable = pair->value;
 
-			/*printf("key2:\n\n%s\n", toString(key2)->text);
-			printf("\n2nd HashTable: \n\n%s\n", toString(secondStageHashTable)->text);*/
+			printf("key2:\n\n%s\n", toString(key2)->text);
+			printf("\n2nd HashTable: \n\n%s\n", toString(secondStageHashTable)->text);
 			
 			struct Pair * secondPair = cast(Pair, search(secondStageHashTable, key2));
-
+			
 			return secondPair ? secondPair->value : NULL;
 		}
 		else
@@ -991,6 +1141,46 @@ static void markStatesWithNumber(struct Set * states)
 	}
 }
 
+static void * initInputQueue(const void * input)
+{
+	struct Queue * inputQueue = new (Queue, 0);
+	char str[2];
+	char *current = input;
+
+	while (*current)
+	{
+		str[0] = *current;
+		str[1] = '\0';
+
+		struct ProductionToken * queueElement = new (ProductionToken, new (String, str, 0), false, 0);
+		enqueue(inputQueue, queueElement);
+
+		current++;
+	}
+
+	struct ProductionToken * dollarSymbol = new (ProductionToken, new (String, "$", 0), false, 0);
+	dollarSymbol->isFlag = true;
+	
+	return inputQueue;
+}
+
+static void * initStateStack(const void * _states)
+{
+	struct Stack * stateStack = new (Stack, 0);
+	struct Set * states = cast(Set, _states);
+	assert(states);
+
+	push(stateStack, states->items[0]);
+
+	return stateStack;
+}
+
+static bool popSymbolsOffStack(const struct Production * production)
+{
+	printf("%s\n", toString(production)->text);
+	return true;
+}
+
 
 
 //static void * Action_ctor(void * self, va_list * args)
@@ -1009,6 +1199,94 @@ static void markStatesWithNumber(struct Set * states)
 //
 //	return self;
 //}
+static bool Action_equals(void * _self, void * _another)
+{
+	struct Action * self = cast(Action, _self);
+	struct Action * another = cast(Action, _another);
+	
+	assert(self && another);
+
+	if (self->isShift != another->isShift)
+	{
+		return false;
+	}
+
+	if (self->isReduce != another->isReduce)
+	{
+		return false;
+	}
+
+	if (self->isAccept != another->isAccept)
+	{
+		return false;
+	}
+
+	if (self->isError != another->isError)
+	{
+		return false;
+	}
+
+	if (self->stateToShift)
+	{
+		if (!another->stateToShift)
+		{
+			return false;
+		}
+		else
+		{
+			if (!equals(self->stateToShift, another->stateToShift))
+			{
+				return false;
+			}
+		}
+	}
+
+	if (self->productionToReduce)
+	{
+		if (!another->productionToReduce)
+		{
+			return false;
+		}
+		else
+		{
+			if (!equals(self->productionToReduce, another->productionToReduce))
+			{
+				return false;
+			}
+		}
+	}
+	
+	return true;
+}
+
+static struct String * Action_toString(const void * _self)
+{
+	struct Action * self = cast(Action, _self);
+
+	assert(self);
+
+	if (self->isShift)
+	{
+		return new (String, "SHIFT", 0);
+	}
+
+	if (self->isReduce)
+	{
+		return new (String, "REDUCE", 0);
+	}
+
+	if (self->isAccept)
+	{
+		return new (String, "ACCEPT", 0);
+	}
+
+	if (self->isError)
+	{
+		return new (String, "ERROR", 0);
+	}
+
+	return new (String, "Damn it!", 0);
+}
 
 
 
@@ -1023,7 +1301,7 @@ void loadSlrAutomata()
 
 	if (!Action)
 	{
-		Action = new (Class, "Action", Object, sizeof(struct Action), 0);
+		Action = new (Class, "Action", Object, sizeof(struct Action), equals, Action_equals, toString, Action_toString, 0);
 	}
 }
 
