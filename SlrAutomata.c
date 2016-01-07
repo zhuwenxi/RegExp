@@ -22,6 +22,8 @@
 #include "OOC\Queue_r.h"
 #include "OOC\Stack.h"
 #include "OOC\Stack_r.h"
+#include "OOC\LinkList.h"
+#include "OOC\LinkList_r.h"
 
 
 
@@ -140,8 +142,36 @@ static void * SlrAutomata_parse(const void * _automata, const void * input)
 		{
 			symbol = clone(dequeue(inputQueue));
 
-			printf("%s\n", toString(state)->text);
-			printf("%s\n============================\n", toString(symbol)->text);
+			/*printf("%s\n", toString(state)->text);
+			printf("%s\n============================\n", toString(symbol)->text);*/
+
+			////
+			//// A little trial...
+			////
+			//struct Pair * hashBySymbolPair = search(automata->ACTION, state);
+			//struct HashTable * hashBySymbol = hashBySymbolPair->value;
+		 //   // printf("%s\n", toString(hashBySymbol->slots[0])->text);
+			//struct Pair * bPair = search(hashBySymbol, symbol);
+
+			//struct LinkList * ll = cast(LinkList, hashBySymbol->slots[0]);
+			//struct LinkListItem * next = ll->head;
+
+			//while (next)
+			//{	
+			//	struct Pair * p = cast(Pair, next->data);
+			//	assert(p);
+
+			//	struct ProductionToken * key = cast(ProductionToken, p->key);
+			//	assert(key);
+			//	
+
+			//	if (!strcmp(key->text->text, "b"))
+			//	{
+			//		printf("%s\n", toString(key)->text);
+			//	}
+
+			//	next = next->next;
+			//}
 
 			nextAction = action(automata, state, symbol);
 			
@@ -891,14 +921,7 @@ static void updateAction(struct SlrAutomata * _slrAutomata, struct Set * _state,
 
 							/*printf("%s\n", toString(state)->text);
 							printf("%s\n", toString(token)->text);*/
-							if (!isA(symbolPair->value, Action))
-							{
-								printf("%s\n", ((struct Class *)classOf(symbolPair->value))->name);
-							} 
-							else
-							{
-								printf("OK\n");
-							}
+						
 							insert(hashBySymbol, symbolPair);
 						}
 						else
@@ -1074,8 +1097,8 @@ static void * queryTwoStageHashTable(const void * _hashTable, const void * key1,
 		{
 			struct HashTable * secondStageHashTable = pair->value;
 
-			printf("key2:\n\n%s\n", toString(key2)->text);
-			printf("\n2nd HashTable: \n\n%s\n", toString(secondStageHashTable)->text);
+			/*printf("key2:\n\n%s\n", toString(key2)->text);
+			printf("\n2nd HashTable: \n\n%s\n", toString(secondStageHashTable)->text);*/
 			
 			struct Pair * secondPair = cast(Pair, search(secondStageHashTable, key2));
 			
@@ -1152,7 +1175,7 @@ static void * initInputQueue(const void * input)
 		str[0] = *current;
 		str[1] = '\0';
 
-		struct ProductionToken * queueElement = new (ProductionToken, new (String, str, 0), false, 0);
+		struct ProductionToken * queueElement = new (ProductionToken, new (String, str, 0), true, 0);
 		enqueue(inputQueue, queueElement);
 
 		current++;
@@ -1288,6 +1311,24 @@ static struct String * Action_toString(const void * _self)
 	return new (String, "Damn it!", 0);
 }
 
+static struct Action * Action_clone(const void * _self)
+{
+	struct Action * self = cast(Action, _self);
+	assert(self);
+
+	struct Action * copy = new (Action, 0);
+	
+	copy->isShift = self->isShift;
+	copy->isReduce = self->isReduce;
+	copy->isAccept = self->isAccept;
+	copy->isError = self->isError;
+
+	copy->productionToReduce = self->productionToReduce ? clone(self->productionToReduce) : NULL;
+	copy->stateToShift = self->stateToShift ? clone(self->stateToShift) : NULL;
+
+	return copy;
+}
+
 
 
 
@@ -1301,7 +1342,7 @@ void loadSlrAutomata()
 
 	if (!Action)
 	{
-		Action = new (Class, "Action", Object, sizeof(struct Action), equals, Action_equals, toString, Action_toString, 0);
+		Action = new (Class, "Action", Object, sizeof(struct Action), equals, Action_equals, toString, Action_toString, clone, Action_clone, 0);
 	}
 }
 
