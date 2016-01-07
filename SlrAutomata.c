@@ -57,7 +57,7 @@ static struct Set * follow(const struct Set * grammar, const struct ProductionTo
 static struct Set * first(struct Set * grammar, struct ProductionToken * symbol);
 static void * initInputQueue(const void * input);
 static void * initStateStack(const void * states);
-static bool popSymbolsOffStack(const struct Production * production);
+static bool reduceSymbols(const struct Production * production, struct Stack * stack);
 static void markStatesWithNumber(struct Set * states);
 static struct HashTable * stateNumberMap;
 
@@ -88,6 +88,14 @@ static void * SlrAutomata_ctor(void * _self, va_list * args)
 	
 	// Init self->states:
 	((struct Automata *)self)->states = constructStates(_self);
+	
+	struct Set * s = ((struct Automata *)self)->states;
+	int i;
+	for (i = 0; i < s->length; i++)
+	{
+		printf("%s\n\n", toString(s->items[i])->text);
+	}
+
 	markStatesWithNumber(((struct Automata *)self)->states);
 	// printf("GOTO:\n\n%s\n", toString(self->GOTO)->text);
 	constructAction(self);
@@ -131,16 +139,22 @@ static void * SlrAutomata_parse(const void * _automata, const void * input)
 	{
 		struct Queue * inputQueue = initInputQueue(input);
 		struct Stack * stateStack = initStateStack(((struct Automata *)automata)->states);
+		struct Stack * symbolsStack = new (Stack, 0);
 
 		// printf("%s\n", toString(inputQueue)->text);
 		
-		struct Set * state = top(stateStack);
-		struct ProductionToken * symbol;
+		struct Set * state;
+
+		struct ProductionToken * symbol = clone(dequeue(inputQueue));
+		unshift(inputQueue, clone(symbol));
+		//printf("origin input stream: %s\n", toString(inputQueue)->text);
+
 		struct Action * nextAction;
 
 		while (true)
 		{
-			symbol = clone(dequeue(inputQueue));
+			// symbol = clone(dequeue(inputQueue));
+			state = top(stateStack);
 
 			printf("%s\n", toString(state)->text);
 			printf("%s\n", toString(symbol)->text);
@@ -183,17 +197,33 @@ static void * SlrAutomata_parse(const void * _automata, const void * input)
 				
 				push(stateStack, stateToShift);
 				
+				push(symbolsStack, symbol);
+
+				dequeue(inputQueue);
 				symbol = dequeue(inputQueue);
+				unshift(inputQueue, clone(symbol));
 
 				printf("Shift: %s\n", toString(stateToShift)->text);
 				printf("=================================\n");
 			}
 			else if (nextAction->isReduce)
 			{
-				popSymbolsOffStack(nextAction->productionToReduce);
+				//printf("before reduce, symbols stack: %s\n", toString(symbolsStack)->text);
+				reduceSymbols(nextAction->productionToReduce, symbolsStack);
 
 				pop(stateStack);
-				push(stateStack, clone(transfor(automata, state, nextAction->productionToReduce->head)));
+				state = top(stateStack);
+				
+				printf("******state: %s\n", toString(state)->text);
+				printf("******symbol: %s\n", toString(nextAction->productionToReduce->head)->text);
+
+				struct Set * nextState = transfor(automata, state, nextAction->productionToReduce->head);
+				
+				push(stateStack, clone(nextState));
+				
+				printf("Reduce: %s\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", toString(symbolsStack)->text);
+
+				// Output the production A -> beta.
 			}
 			else if (nextAction->isAccept)
 			{
@@ -1201,9 +1231,39 @@ static void * initStateStack(const void * _states)
 	return stateStack;
 }
 
-static bool popSymbolsOffStack(const struct Production * production)
+static bool reduceSymbols(const struct Production * production, struct Stack * stack)
 {
-	printf("%s\n", toString(production)->text);
+	//printf("%s\n", toString(production)->text);
+	/*printf("stack before: %s\n", toString(stack)->text);*/
+	assert(production && stack);
+
+	const struct Set * body = production->body;
+	const struct ProductionToken * head = production->head;
+	assert(body && head);
+
+	// Pop production body. e.g. beta
+	int i;
+	for (i = body->length - 2; i >= 0; i--)
+	{
+		struct ProductionToken * symbol = cast(ProductionToken, body->items[i]);
+
+		assert(symbol);
+
+		/*if (equals(symbol, top(stack)))
+		{*/
+		pop(stack);
+		//}
+		//else
+		//{
+		//	// Error!
+		//	assert(0);
+		//	return false;
+		//}
+	}
+	
+	// Push production head. e.g. A
+	push(stack, clone(head));
+	/*printf("symbols stack: %s\n", toString(stack)->text);*/
 	return true;
 }
 
