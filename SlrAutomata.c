@@ -142,8 +142,8 @@ static void * SlrAutomata_parse(const void * _automata, const void * input)
 		{
 			symbol = clone(dequeue(inputQueue));
 
-			/*printf("%s\n", toString(state)->text);
-			printf("%s\n============================\n", toString(symbol)->text);*/
+			printf("%s\n", toString(state)->text);
+			printf("%s\n", toString(symbol)->text);
 
 			////
 			//// A little trial...
@@ -184,6 +184,9 @@ static void * SlrAutomata_parse(const void * _automata, const void * input)
 				push(stateStack, stateToShift);
 				
 				symbol = dequeue(inputQueue);
+
+				printf("Shift: %s\n", toString(stateToShift)->text);
+				printf("=================================\n");
 			}
 			else if (nextAction->isReduce)
 			{
