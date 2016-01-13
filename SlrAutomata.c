@@ -57,9 +57,10 @@ static struct Set * follow(const struct Set * grammar, const struct ProductionTo
 static struct Set * first(struct Set * grammar, struct ProductionToken * symbol);
 static void * initInputQueue(const void * input);
 static void * initStateStack(const void * states);
-static bool reduceSymbols(const struct Production * production, struct Stack * stack);
+static bool reduceSymbols(const struct Production * production, struct Stack * stack, struct Stack * stateStack);
 static void markStatesWithNumber(struct Set * states);
 static struct HashTable * stateNumberMap;
+static void printStateStack(const struct Stack * stateStack);
 
 
 
@@ -89,12 +90,12 @@ static void * SlrAutomata_ctor(void * _self, va_list * args)
 	// Init self->states:
 	((struct Automata *)self)->states = constructStates(_self);
 	
-	struct Set * s = ((struct Automata *)self)->states;
+	/*struct Set * s = ((struct Automata *)self)->states;
 	int i;
 	for (i = 0; i < s->length; i++)
 	{
 		printf("%s\n\n", toString(s->items[i])->text);
-	}
+	}*/
 
 	markStatesWithNumber(((struct Automata *)self)->states);
 	// printf("GOTO:\n\n%s\n", toString(self->GOTO)->text);
@@ -204,24 +205,41 @@ static void * SlrAutomata_parse(const void * _automata, const void * input)
 				unshift(inputQueue, clone(symbol));
 
 				printf("Shift: %s\n", toString(stateToShift)->text);
+
+				printStateStack(stateStack);
+
 				printf("=================================\n");
+
+				
 			}
 			else if (nextAction->isReduce)
 			{
 				//printf("before reduce, symbols stack: %s\n", toString(symbolsStack)->text);
-				reduceSymbols(nextAction->productionToReduce, symbolsStack);
+				reduceSymbols(nextAction->productionToReduce, symbolsStack, stateStack);
 
-				pop(stateStack);
+				//
+				// Move the pop operation to the "reduceSymbols()":
+				// 
+				// pop(stateStack);
+
 				state = top(stateStack);
 				
-				printf("******state: %s\n", toString(state)->text);
-				printf("******symbol: %s\n", toString(nextAction->productionToReduce->head)->text);
+				/*printf("******state: %s\n", toString(state)->text);
+				printf("******symbol: %s\n", toString(nextAction->productionToReduce->head)->text);*/
 
 				struct Set * nextState = transfor(automata, state, nextAction->productionToReduce->head);
 				
-				push(stateStack, clone(nextState));
+				//if (nextState)
+				//{
+					push(stateStack, clone(nextState));
+				//}
 				
-				printf("Reduce: %s\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n", toString(symbolsStack)->text);
+				printf("Reduce: %s\n", toString(symbolsStack)->text);
+
+				printStateStack(stateStack);
+
+				printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+				// printf("stack:\n+++++++++++++++\n%s\n--------------------\n", toString(stateStack)->text);
 
 				// Output the production A -> beta.
 			}
@@ -238,7 +256,11 @@ static void * SlrAutomata_parse(const void * _automata, const void * input)
 				// Error!
 				// TO DO: call error-recovery routine.
 				//
-				break;
+				printf("handle error:\n");
+				/*pop(stateStack);
+				printStateStack(stateStack);*/
+				printf("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
+				// break;
 			}
 		}
 		
@@ -1197,6 +1219,30 @@ static void markStatesWithNumber(struct Set * states)
 	}
 }
 
+static void printStateStack(const struct Stack * stateStack)
+{
+	assert(stateStack);
+
+	struct Set * set = cast(Set, stateStack->stack);
+	assert(set);
+
+	int i;
+	for (i = 0; i < set->length; i++)
+	{
+		struct Set * state = cast(Set, set->items[i]);
+		assert(state);
+
+		struct Pair * statePair = cast(Pair, search(stateNumberMap, state));
+		assert(statePair);
+
+		struct Integer * number = cast(Integer, statePair->value);
+		
+		printf("%d ", number->value);
+	}
+
+	printf("\n");
+}
+
 static void * initInputQueue(const void * input)
 {
 	struct Queue * inputQueue = new (Queue, 0);
@@ -1216,6 +1262,7 @@ static void * initInputQueue(const void * input)
 
 	struct ProductionToken * dollarSymbol = new (ProductionToken, new (String, "$", 0), false, 0);
 	dollarSymbol->isFlag = true;
+	enqueue(inputQueue, dollarSymbol);
 	
 	return inputQueue;
 }
@@ -1231,7 +1278,7 @@ static void * initStateStack(const void * _states)
 	return stateStack;
 }
 
-static bool reduceSymbols(const struct Production * production, struct Stack * stack)
+static bool reduceSymbols(const struct Production * production, struct Stack * stack, struct Stack * stateStack)
 {
 	//printf("%s\n", toString(production)->text);
 	/*printf("stack before: %s\n", toString(stack)->text);*/
@@ -1252,6 +1299,7 @@ static bool reduceSymbols(const struct Production * production, struct Stack * s
 		/*if (equals(symbol, top(stack)))
 		{*/
 		pop(stack);
+		pop(stateStack);
 		//}
 		//else
 		//{
@@ -1430,3 +1478,4 @@ struct Set * test_first(struct Set * grammar, struct ProductionToken * symbol)
 {
 	return first(grammar, symbol);
 }
+

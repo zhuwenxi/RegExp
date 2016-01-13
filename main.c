@@ -70,6 +70,8 @@ int main()
 	void * slrAutomata = new (SlrAutomata, grammar, 0);
 
 	// parse(slrAutomata, "(a|b)*abb");
+	parse(slrAutomata, "(a|b)*abb");
+	// parse(slrAutomata, "ab");
 
 	delete(slrAutomata);
 
